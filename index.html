@@ -11,7 +11,7 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 body{margin:0;background:var(--bg);color:var(--tx);font:500 15px/1.45 "Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body:not(.admin) .adm{display:none!important}
 header{padding:20px 32px 8px;max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
-h1{font-size:22px;margin:0;color:var(--h1);font-weight:700}h1 small{display:block;font-size:13px;color:var(--mut);font-weight:400}
+h1{font-size:30px;line-height:1.15;margin:0;color:var(--h1);font-weight:700}h1 small{display:block;font-size:13px;color:var(--mut);font-weight:400}
 main{max-width:1400px;margin:0 auto;padding:8px 32px 40px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px;align-items:center}
 .sortbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
@@ -44,12 +44,13 @@ dialog input,dialog select,dialog textarea{width:100%}
 #view[open]{display:flex}
 #view .pic{flex:0 0 33.333%;min-width:0;background:var(--ac2);display:flex;align-items:center;justify-content:center;padding:20px}
 #view .pic img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
-#view .info{flex:1 1 0;min-width:0;padding:44px 48px;display:flex;flex-direction:column;gap:28px;position:relative;overflow:auto}
+#view .info{flex:1 1 0;min-width:0;padding:clamp(18px,4vh,44px) clamp(20px,3.5vw,48px);display:flex;flex-direction:column;justify-content:center;gap:clamp(14px,3vh,28px);position:relative;overflow:auto}
 #view .x{position:absolute;top:14px;right:14px;border-radius:99px;padding:5px 12px}
-#view .big{font-size:52px;font-weight:700;color:var(--act);line-height:1.05}
+#view .big{font-size:clamp(26px,6.5vh,52px);font-weight:700;color:var(--act);line-height:1.1;padding-right:36px;word-break:break-word}
+#view .fields{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,2.6vh,24px) 24px}
 #view .nm{font-size:24px;font-weight:700;margin-top:4px}
 #view .k{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-#view .v{font-size:22px;font-weight:700;word-break:break-word}
+#view .v{font-size:clamp(15px,3vh,22px);font-weight:700;word-break:break-word}
 #view .acts{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
 @media (max-width:700px){
  #view{width:94vw;height:90vh;overflow:auto}
@@ -74,6 +75,15 @@ dialog input,dialog select,dialog textarea{width:100%}
 .cg button.end::after{background:#fff}
 .ext{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;cursor:pointer}
 .ext input{width:auto;padding:0;margin:0}
+.ms{position:relative}
+.msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
+.msb.on{border-color:var(--ac);background:var(--ac2)}
+.msp{position:absolute;top:calc(100% + 6px);left:0;z-index:20;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 8px 28px rgba(0,0,0,.25)}
+.msp[hidden]{display:none}
+.msl{max-height:300px;overflow:auto;margin-bottom:6px}
+.sortbar .msp label{color:var(--tx);font-size:14px;padding:6px 8px;border-radius:8px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.sortbar .msp label:hover{background:var(--ac2)}
+.msp input{width:auto;padding:0;margin:0}
 .signd{background:var(--ac);color:#fff;border-color:var(--ac);width:min(360px,92vw)}
 .signd input{display:block;width:100%;margin:8px 0;background:#fff;color:#111;border:0}
 .signd .warn{font-size:13px;margin:10px 0 4px}
@@ -111,15 +121,7 @@ dialog input,dialog select,dialog textarea{width:100%}
     <label>Shop
       <select id="s-shop"></select>
     </label>
-    <label>Members
-      <select id="s-mem"></select>
-    </label>
-    <label>Era
-      <select id="s-era"></select>
-    </label>
-    <label>Round
-      <select id="s-round"></select>
-    </label>
+    <div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div>
     <button class="sm" id="reset">Reset filters</button>
   </div>
   <div class="cnt" id="cnt"></div>
@@ -130,7 +132,7 @@ dialog input,dialog select,dialog textarea{width:100%}
 
 <dialog id="signdlg" class="signd">
   <h3 style="margin:0 0 6px">Sign in</h3>
-  <input id="sgtk" type="password" placeholder="GitHub token" autocomplete="off">
+  <input id="sgtk" type="password" placeholder="Password" autocomplete="off">
   <div class="warn">⚠️ admin sign in for updating only!</div>
   <div id="sgerr" class="sgerr"></div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="sgcancel">Cancel</button><button class="go" id="sgok">Sign in</button></div>
@@ -161,11 +163,13 @@ dialog input,dialog select,dialog textarea{width:100%}
   <div class="pic"><img id="vimg" alt=""></div>
   <div class="info">
     <button class="x sm" id="vx">✕</button>
-    <div><div class="k">Member</div><div class="big" id="vid"></div><div class="nm" id="vname"></div></div>
-    <div><div class="k">Shop</div><div class="v" id="vshop"></div></div>
-    <div><div class="k">Era</div><div class="v" id="vera"></div></div>
-    <div><div class="k">Round</div><div class="v" id="vround"></div></div>
-    <div><div class="k">Date</div><div class="v" id="vdate"></div></div>
+    <div><div class="k">Member</div><div class="big" id="vmem"></div></div>
+    <div class="fields">
+      <div><div class="k">Shop</div><div class="v" id="vshop"></div></div>
+      <div><div class="k">Date</div><div class="v" id="vdate"></div></div>
+      <div><div class="k">Era</div><div class="v" id="vera"></div></div>
+      <div><div class="k">Round</div><div class="v" id="vround"></div></div>
+    </div>
   </div>
 </dialog>
 
@@ -178,7 +182,7 @@ if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.host
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
 const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
-const ROUNDS=[...Array.from({length:17},(_,i)=>(i+1)+'.0'),'POB','Luckydraw','Album Inclusion','etc.'];   /* 21 items */
+const ROUNDS=['Album Inclusion','Luckydraw','POB',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* 21 items */
 const NMEM=24,PAGE=120,MIN={y:2025,m:7};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 /* ===== state ===== */
@@ -208,9 +212,29 @@ applyTheme();
 
 const memOpts=f=>`<option value="">${f}</option>`+Array.from({length:NMEM},(_,i)=>`<option value="${i+1}">id${i+1}${memN(i+1)?' '+esc(memN(i+1)):''}</option>`).join('');
 const listOpts=(a,f)=>`<option value="">${f}</option>`+a.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
-$('fmem').innerHTML=memOpts('—');$('s-mem').innerHTML=memOpts('All members');
-$('fera').innerHTML=listOpts(ERAS,'—');$('s-era').innerHTML=listOpts(ERAS,'All eras');
-$('fround').innerHTML=listOpts(ROUNDS,'—');$('s-round').innerHTML=listOpts(ROUNDS,'All rounds');
+$('fmem').innerHTML=memOpts('—');$('fera').innerHTML=listOpts(ERAS,'—');$('fround').innerHTML=listOpts(ROUNDS,'—');
+/* multi-select filters */
+const MSS=[];
+const closeAll=()=>document.querySelectorAll('.msp').forEach(p=>p.hidden=true);
+function makeMS(id,label,opts){
+  const root=$(id),set=new Set();
+  root.className='ms';
+  root.innerHTML=`<button type="button" class="msb"></button><div class="msp" hidden><div class="msl">${opts.map(o=>`<label><input type="checkbox" value="${esc(o.v)}"> ${esc(o.t)}</label>`).join('')}</div><button type="button" class="sm msc">Clear</button></div>`;
+  const b=root.querySelector('.msb'),p=root.querySelector('.msp');
+  const upd=()=>{
+    b.textContent=label+': '+(set.size===0?'All':set.size===1?opts.find(o=>o.v===[...set][0]).t:set.size+' selected');
+    b.classList.toggle('on',set.size>0);
+  };
+  b.onclick=e=>{e.stopPropagation();const open=p.hidden;closeAll();p.hidden=!open};
+  p.onchange=e=>{const c=e.target;c.checked?set.add(c.value):set.delete(c.value);upd();go()};
+  const clear=()=>{set.clear();p.querySelectorAll('input').forEach(i=>i.checked=false);upd()};
+  root.querySelector('.msc').onclick=()=>{clear();go()};
+  MSS.push(clear);upd();return set;
+}
+const selMem=makeMS('ms-mem','Members',Array.from({length:NMEM},(_,i)=>({v:String(i+1),t:'id'+(i+1)+(memN(i+1)?' '+memN(i+1):'')})));
+const selEra=makeMS('ms-era','Era',ERAS.map(e=>({v:e,t:e})));
+const selRound=makeMS('ms-round','Round',ROUNDS.map(e=>({v:e,t:e})));
+document.addEventListener('click',e=>{if(!e.target.closest('.ms'))closeAll()});
 
 function inRange(d){
   if(!range)return true;if(!d)return false;
@@ -225,10 +249,11 @@ function render(){
   sel.innerHTML='<option value="">All shops</option>'+shops.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
   sel.value=shops.includes(cur)?cur:'';
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
-  const fs=sel.value,fm=$('s-mem').value,fe=$('s-era').value,fr=$('s-round').value;
-  sel.classList.toggle('on',!!fs);$('s-mem').classList.toggle('on',!!fm);$('s-era').classList.toggle('on',!!fe);$('s-round').classList.toggle('on',!!fr);
-  const list=items.filter(i=>inRange(i.date)&&(!fs||i.shop===fs)&&(!fm||String(i.mem)===fm)&&(!fe||i.era===fe)&&(!fr||i.round===fr)
-    &&(!q||norm(i.shop+' '+memL(i.mem)+' '+memN(i.mem)+' '+(i.era||'')+' '+(i.round||'')+' '+i.date).includes(q)));
+  const fs=sel.value;
+  sel.classList.toggle('on',!!fs);
+  const toks=q.split(/\s+/).filter(Boolean);
+  const list=items.filter(i=>inRange(i.date)&&(!fs||i.shop===fs)&&(!selMem.size||selMem.has(String(i.mem)))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))
+    &&(!toks.length||(h=>toks.every(t=>/^id\d+$/.test(t)?memL(i.mem)===t:h.includes(t)))(norm(i.shop+' '+memL(i.mem)+' '+memN(i.mem)+' '+(i.era||'')+' '+(i.round||'')+' '+i.date))));
   list.sort((a,b)=>(a.date||'')<(b.date||'')?-1:(a.date||'')>(b.date||'')?1:0);
   if(sortD==='desc')list.reverse();
   $('s-date').value=sortD;
@@ -237,7 +262,7 @@ function render(){
    <div class="meta">${fmt(i.date)}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
   $('empty').hidden=list.length>0;$('more').hidden=list.length<=shown;
-  $('cnt').textContent=`${list.length}/${items.length} pola found!`;
+  $('cnt').textContent=`${list.length} pola found!`;
   $('calbtn').textContent='📅 '+(range?(range.b&&range.b!==range.a?fmt(range.a<range.b?range.a:range.b)+' → '+fmt(range.a<range.b?range.b:range.a):fmt(range.a))+(ext?' ±2d':''):'Date');
   $('calbtn').classList.toggle('on',!!range);
 }
@@ -276,8 +301,8 @@ document.addEventListener('click',e=>{if(!$('cal').contains(e.target))$('cal').h
 
 /* filters */
 $('s-date').onchange=e=>{sortD=e.target.value;go()};
-['s-shop','s-mem','s-era','s-round'].forEach(id=>$(id).onchange=go);
-$('reset').onclick=()=>{$('q').value='';range=null;ext=false;['s-shop','s-mem','s-era','s-round'].forEach(id=>$(id).value='');sortD='desc';go()};
+$('s-shop').onchange=go;
+$('reset').onclick=()=>{$('q').value='';range=null;ext=false;$('s-shop').value='';MSS.forEach(f=>f());sortD='desc';go()};
 $('q').addEventListener('input',go);
 
 /* ===== GitHub as the database (admin only) ===== */
@@ -355,8 +380,7 @@ $('add').onclick=()=>openDlg();
 
 /* detail view */
 function openView(it){
-  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vid').textContent=memL(it.mem);
-  $('vname').textContent=memN(it.mem)||(it.mem?'Name not set yet':'');
+  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vmem').textContent=it.mem?memL(it.mem)+(memN(it.mem)?' '+memN(it.mem):''):'—';
   $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vdate').textContent=fmt(it.date);
   $('view').scrollTop=0;$('view').showModal();
 }
@@ -382,7 +406,7 @@ async function verify(t){
 function setAdmin(v){admin=v;document.body.classList.toggle('admin',v);$('sign').textContent=v?'Sign out':'Sign in';load()}
 $('sign').onclick=()=>{
   if(admin){token='';try{localStorage.removeItem('pob-gh')}catch(e){}setAdmin(false);return}
-  $('sgerr').textContent=CFG.owner?'':'Repository is not configured (see CFG in the code).';$('signdlg').showModal();
+  $('sgerr').textContent='';$('signdlg').showModal();
 };
 $('sgcancel').onclick=()=>$('signdlg').close();
 $('sgok').onclick=async()=>{
