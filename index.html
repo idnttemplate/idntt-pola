@@ -1,15 +1,14 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>idntt pola tracker</title>
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
-   <link rel="apple-touch-icon" href="logo.jp">
+<link rel="icon" type="image/jpeg" href="logo.jpg"><link rel="apple-touch-icon" href="logo.jpg">
 <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("pob-theme")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-theme","dark")}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f6fb;--card:#fff;--tx:#161a26;--mut:#6a7086;--bd:#dfe3ee;--ac:#1d3fa8;--act:#1d3fa8;--ac2:#e6ecfb;--danger:#d63b3b;--h1:#1d3fa8;
+:root{--bg:#f4f6fb;--card:#fff;--tx:#161a26;--mut:#6a7086;--bd:#dfe3ee;--ac:#1d3fa8;--act:#1d3fa8;--ac2:#e6ecfb;--danger:#d63b3b;--h1:#1d3fa8;--cb:#111;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131c;--card:#1a1f2d;--tx:#eef1f8;--mut:#98a0b8;--bd:#2a3145;--ac:#2b52c7;--act:#8fb0ff;--ac2:#1b2748;--danger:#ff7070;--h1:#eef1f8;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#10131c;--card:#1a1f2d;--tx:#eef1f8;--mut:#98a0b8;--bd:#2a3145;--ac:#2b52c7;--act:#8fb0ff;--ac2:#1b2748;--danger:#ff7070;--h1:#eef1f8;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10131c;--card:#1a1f2d;--tx:#eef1f8;--mut:#98a0b8;--bd:#2a3145;--ac:#2b52c7;--act:#8fb0ff;--ac2:#1b2748;--danger:#ff7070;--h1:#eef1f8;--cb:#fff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10131c;--card:#1a1f2d;--tx:#eef1f8;--mut:#98a0b8;--bd:#2a3145;--ac:#2b52c7;--act:#8fb0ff;--ac2:#1b2748;--danger:#ff7070;--h1:#eef1f8;--cb:#fff;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:500 15px/1.45 "Lexend",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body:not(.admin) .adm{display:none!important}
@@ -30,11 +29,11 @@ select.on,button.on{border-color:var(--ac);background:var(--ac2)}
 @media (max-width:1100px){.grid{grid-template-columns:repeat(6,minmax(0,1fr))}}
 @media (max-width:800px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:520px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.card{background:var(--card);border:1px solid var(--cb);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .card img{width:100%;aspect-ratio:11/17;object-fit:contain;display:block;cursor:zoom-in;background:var(--ac2)}
 .card .i{padding:7px 8px;display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
-.shop{font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mem{color:var(--act);font-weight:700;font-size:12.5px}.meta{color:var(--mut);font-size:11.5px}
+.shop{font-weight:700;font-size:12.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.mem{color:var(--act);font-weight:700;font-size:12.5px;line-height:1.3;overflow-wrap:anywhere}.meta{color:var(--mut);font-size:11.5px}
 .row{display:flex;gap:4px;margin-top:auto;padding-top:6px}
 .row button{padding:2px 7px;font-size:12px;border-radius:8px}
 .empty{text-align:center;color:var(--mut);padding:60px 10px}
@@ -83,6 +82,17 @@ dialog input,dialog select,dialog textarea{width:100%}
 #aboutdlg h3{font-size:24px}
 #aboutdlg .ab-close{margin-top:auto;align-self:flex-end}
 @media (max-width:700px){#aboutdlg{width:92vw}}
+.card{position:relative}
+.card .pick{position:absolute;top:6px;left:6px;width:22px;height:22px;padding:0;margin:0;z-index:2;accent-color:var(--ac);cursor:pointer}
+#bulk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ac2);border:1px solid var(--ac);border-radius:12px;padding:10px 12px;margin:8px 0;position:sticky;top:8px;z-index:15}
+#bulk[hidden]{display:none}
+#bulk select,#bulk input{height:36px;padding:0 10px;font-size:14px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.logo{width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none}
+a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-weight:700}
+.sortbar select,.sortbar .msb,.sortbar #reset{width:210px;max-width:none;height:40px;font-size:14px;padding:0 12px;text-align:left}
+.sortbar #reset{text-align:center}
+@media (max-width:700px){.sortbar>*{flex:1 1 44%}.sortbar select,.sortbar .msb,.sortbar #reset{width:100%}}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -106,11 +116,13 @@ dialog input,dialog select,dialog textarea{width:100%}
 </style></head><body>
 
 <header>
-  <h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small></h1>
+  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small></h1></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-    <button id="about" class="sm">About</button>
-    <button id="theme" class="sm" title="Switch theme">Theme: 🌙 Dark</button>
-    <button id="sign" class="sm">Sign in</button>
+    <a class="hb" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
+    <a class="hb" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
+    <button id="about" class="sm pri">About</button>
+    <button id="theme" class="sm pri" title="Switch theme">Theme: 🌙 Dark</button>
+    <button id="sign" class="sm pri">Sign in</button>
   </div>
 </header>
 <main>
@@ -123,12 +135,18 @@ dialog input,dialog select,dialog textarea{width:100%}
     <button class="pri adm" id="add">＋ Add image</button>
   </div>
   <div class="sortbar">
-    <label>Time
-      <select id="s-date"><option value="asc">A–Z (oldest first)</option><option value="desc">Z–A (newest first)</option></select>
-    </label>
+    <select id="s-date"><option value="asc">Sort by: A–Z (oldest first)</option><option value="desc">Sort by: Z–A (newest first)</option><option value="first">Sort by: first member (id1 → id24)</option><option value="last">Sort by: last member (id24 → id1)</option></select>
     <div id="ms-shop"></div>
     <div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div>
-    <button class="sm" id="reset">Reset filters</button>
+    <button id="reset">Reset filters</button>
+  </div>
+  <div id="bulk" class="adm" hidden>
+    <b id="bkn"></b>
+    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Member</option><option value="era">Era</option><option value="round">Round</option><option value="date">Date</option><option value="set">Set</option></select>
+    <span id="bkval"></span>
+    <button class="pri sm" id="bkapply">Apply to selected</button>
+    <button class="sm" id="bkall">Select all shown results</button>
+    <button class="sm" id="bkclr">Clear selection</button>
   </div>
   <div class="cnt" id="cnt"></div>
   <div class="grid" id="grid"></div>
@@ -162,6 +180,7 @@ dialog input,dialog select,dialog textarea{width:100%}
   <label>Era</label><select id="fera"></select>
   <label>Round</label><select id="fround"></select>
   <label>Date</label><input type="date" id="fdate" min="2025-08-01">
+  <label>Set (admin only, optional: 1, 2, 3…)</label><input type="number" id="fset" min="1" placeholder="e.g. 1">
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
     <button id="cancel">Cancel</button><button class="pri" id="save">Save</button>
   </div>
@@ -196,7 +215,7 @@ const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 /* ===== state ===== */
 const GH=`https://api.github.com/repos/${CFG.owner}/${CFG.repo}`;
 const RAW=`https://raw.githubusercontent.com/${CFG.owner}/${CFG.repo}/${CFG.branch}/`;
-let items=[],admin=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
+let items=[],lastList=[],picked=new Set(),admin=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
 try{token=localStorage.getItem('pob-gh')||''}catch(e){}
 calM=new Date(Math.max(calM,new Date(MIN.y,MIN.m,1)));calM.setDate(1);
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -269,13 +288,26 @@ function render(){
   const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||selMem.has(String(i.mem)))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))
     &&(!toks.length||(h=>toks.every(t=>/^id\d+$/.test(t)?memL(i.mem)===t:h.includes(t)))(norm(i.shop+' '+memL(i.mem)+' '+memN(i.mem)+' '+(i.era||'')+' '+(i.round||'')+' '+i.date))));
   /* by event date; within the same date: id1 first ... id24 last */
-  list.sort((a,b)=>{const da=a.date||'',db=b.date||'';if(da!==db)return sortD==='desc'?(da<db?1:-1):(da<db?-1:1);return (a.mem||999)-(b.mem||999)});
+  list.sort((a,b)=>{
+    const da=a.date||'',db=b.date||'',sa=a.set||9999,sb=b.set||9999,ma=a.mem||999,mb=b.mem||999;
+    if(sortD==='first'||sortD==='last'){
+      if(ma!==mb){if(!a.mem!==!b.mem)return a.mem?-1:1;return sortD==='first'?ma-mb:mb-ma}
+      if(da!==db)return da<db?1:-1;
+      return sa-sb;
+    }
+    if(da!==db)return sortD==='desc'?(da<db?1:-1):(da<db?-1:1);   /* 1. date */
+    if(sa!==sb)return sa-sb;                                       /* 2. set (admin-numbered) */
+    return ma-mb;                                                  /* 3. member id1 -> id24 */
+  });
+  lastList=list;
+  for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
-  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card"><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
-   <div class="shop" title="${esc(i.shop)}">${esc(i.shop)||'—'}</div><div class="mem">${memL(i.mem)}</div>
-   <div class="meta">${fmt(i.date)}</div>
+  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}<img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
+   <div class="shop" title="${esc((i.shop||'')+(i.round?' '+i.round:''))}">${esc((i.shop||'—')+(i.round?' '+i.round:''))}</div><div class="mem">${esc(memL(i.mem)+(memN(i.mem)?' '+memN(i.mem):''))}</div>
+   <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
   $('empty').hidden=list.length>0;$('more').hidden=list.length<=shown;
+  updBulk();
   $('cnt').textContent=`${list.length} pola found!`;
   $('calbtn').textContent='📅 '+(range?(range.b&&range.b!==range.a?fmt(range.a<range.b?range.a:range.b)+' → '+fmt(range.a<range.b?range.b:range.a):fmt(range.a))+(ext?' ±2d':''):'Date');
   $('calbtn').classList.toggle('on',!!range);
@@ -363,12 +395,12 @@ function openDlg(it){
   if(!admin)return;
   editId=it?it.id:null;$('dt').textContent=it?'Edit':'Add images';$('filerow').hidden=!!it;
   $('fshop').value=it?.shop||'';$('fmem').value=it?.mem||'';$('fera').value=it?.era||'';$('fround').value=it?.round||'';
-  $('fdate').value=it?.date||ds(new Date());$('file').value='';setProg('');
+  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('file').value='';setProg('');
   $('dlg').showModal();
 }
 $('save').onclick=async()=>{
   if(!admin)return;
-  const meta={shop:$('fshop').value.trim(),mem:parseInt($('fmem').value)||null,era:$('fera').value,round:$('fround').value,date:$('fdate').value};
+  const meta={shop:$('fshop').value.trim(),mem:parseInt($('fmem').value)||null,era:$('fera').value,round:$('fround').value,date:$('fdate').value,set:parseInt($('fset').value)||null};
   $('save').disabled=true;
   try{
     if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>a.map(i=>i.id===editId?{...i,...meta}:i)})}
@@ -390,6 +422,35 @@ $('save').onclick=async()=>{
 };
 $('cancel').onclick=()=>$('dlg').close();
 $('add').onclick=()=>openDlg();
+
+/* bulk edit (admin only) */
+function updBulk(){$('bulk').hidden=!(admin&&picked.size);$('bkn').textContent=picked.size+' selected'}
+function bkInput(){
+  const f=$('bkfield').value;
+  $('bkval').innerHTML={
+    shop:'<input id="bkv" list="shops" placeholder="Shop name">',
+    mem:`<select id="bkv">${memOpts('—')}</select>`,
+    era:`<select id="bkv">${listOpts(ERAS,'—')}</select>`,
+    round:`<select id="bkv">${listOpts(ROUNDS,'—')}</select>`,
+    date:'<input id="bkv" type="date" min="2025-08-01">',
+    set:'<input id="bkv" type="number" min="1" placeholder="set no. (blank = clear)" style="width:190px">'
+  }[f];
+}
+$('bkfield').onchange=bkInput;bkInput();
+$('grid').addEventListener('change',e=>{const c=e.target.closest('.pick');if(!c)return;c.checked?picked.add(c.dataset.p):picked.delete(c.dataset.p);updBulk()});
+$('bkall').onclick=()=>{lastList.forEach(i=>picked.add(i.id));render()};
+$('bkclr').onclick=()=>{picked.clear();render()};
+$('bkapply').onclick=async()=>{
+  if(!admin||!picked.size)return;
+  const f=$('bkfield').value;let v=$('bkv').value.trim();
+  if(f==='mem'||f==='set')v=parseInt(v)||null;
+  if(!confirm(`Set ${f} to "${v===null||v===''?'(empty)':v}" for ${picked.size} pola?`))return;
+  const ids=new Set(picked);
+  $('bkapply').disabled=true;
+  try{await commit(`Bulk edit ${ids.size} pola`,{mutate:a=>a.map(i=>ids.has(i.id)?{...i,[f]:v}:i)});picked.clear();render();alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('bkapply').disabled=false}
+};
 
 /* detail view */
 function openView(it){
