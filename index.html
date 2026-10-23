@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>idntt pola tracker</title>
+<script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("pob-theme")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-theme","dark")}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -75,6 +76,11 @@ dialog input,dialog select,dialog textarea{width:100%}
 .cg button.end::after{background:#fff}
 .ext{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;cursor:pointer}
 .ext input{width:auto;padding:0;margin:0}
+#aboutdlg{width:50vw;min-height:50vh;padding:28px 34px;font-size:16px;line-height:1.6}
+#aboutdlg[open]{display:flex;flex-direction:column}
+#aboutdlg h3{font-size:24px}
+#aboutdlg .ab-close{margin-top:auto;align-self:flex-end}
+@media (max-width:700px){#aboutdlg{width:92vw}}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -101,7 +107,7 @@ dialog input,dialog select,dialog textarea{width:100%}
   <h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small></h1>
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
     <button id="about" class="sm">About</button>
-    <button id="theme" class="sm" title="Switch theme">Theme: Auto</button>
+    <button id="theme" class="sm" title="Switch theme">Theme: 🌙 Dark</button>
     <button id="sign" class="sm">Sign in</button>
   </div>
 </header>
@@ -118,9 +124,7 @@ dialog input,dialog select,dialog textarea{width:100%}
     <label>Time
       <select id="s-date"><option value="asc">A–Z (oldest first)</option><option value="desc">Z–A (newest first)</option></select>
     </label>
-    <label>Shop
-      <select id="s-shop"></select>
-    </label>
+    <div id="ms-shop"></div>
     <div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div>
     <button class="sm" id="reset">Reset filters</button>
   </div>
@@ -139,10 +143,12 @@ dialog input,dialog select,dialog textarea{width:100%}
 </dialog>
 
 <dialog id="aboutdlg" class="signd">
-  <h3 style="margin:0 0 10px">About</h3>
-  <p style="margin:6px 0">© <a href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a> on X</p>
-  <p style="margin:6px 0">this website is currently on demo mode, other information about date/round will be updated later.</p>
-  <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="go" id="abclose">Close</button></div>
+  <h3 style="margin:0 0 14px">About</h3>
+  <p style="margin:8px 0">© <a href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a> on X</p>
+  <p style="margin:8px 0">this website is currently on demo mode, other information about date/round will be updated later.</p>
+  <p style="margin:8px 0">notes: type of events (fancall, fansign, etc.) will not be updated for now.</p>
+  <p style="margin:8px 0">physical objekts will not be updated</p>
+  <button class="go ab-close" id="abclose">Close</button>
 </dialog>
 
 <dialog id="dlg">
@@ -201,13 +207,13 @@ const addD=(s,n)=>{const x=new Date(s+'T00:00');x.setDate(x.getDate()+n);return 
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 /* theme */
-let theme='auto';
-try{theme=localStorage.getItem('pob-theme')||'auto'}catch(e){}
+let theme='dark';
+try{theme=localStorage.getItem('pob-theme')==='light'?'light':'dark'}catch(e){}
 function applyTheme(){
-  if(theme==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',theme);
-  $('theme').textContent='Theme: '+{auto:'Auto',light:'☀ Light',dark:'🌙 Dark'}[theme];
+  document.documentElement.setAttribute('data-theme',theme);
+  $('theme').textContent='Theme: '+(theme==='dark'?'🌙 Dark':'☀ Light');
 }
-$('theme').onclick=()=>{theme={auto:'light',light:'dark',dark:'auto'}[theme];try{localStorage.setItem('pob-theme',theme)}catch(e){}applyTheme()};
+$('theme').onclick=()=>{theme=theme==='dark'?'light':'dark';try{localStorage.setItem('pob-theme',theme)}catch(e){}applyTheme()};
 applyTheme();
 
 const memOpts=f=>`<option value="">${f}</option>`+Array.from({length:NMEM},(_,i)=>`<option value="${i+1}">id${i+1}${memN(i+1)?' '+esc(memN(i+1)):''}</option>`).join('');
@@ -216,21 +222,31 @@ $('fmem').innerHTML=memOpts('—');$('fera').innerHTML=listOpts(ERAS,'—');$('f
 /* multi-select filters */
 const MSS=[];
 const closeAll=()=>document.querySelectorAll('.msp').forEach(p=>p.hidden=true);
-function makeMS(id,label,opts){
-  const root=$(id),set=new Set();
+const MSF={};
+function makeMS(id,label,init){
+  const root=$(id),set=new Set();let opts=[],key='';
   root.className='ms';
-  root.innerHTML=`<button type="button" class="msb"></button><div class="msp" hidden><div class="msl">${opts.map(o=>`<label><input type="checkbox" value="${esc(o.v)}"> ${esc(o.t)}</label>`).join('')}</div><button type="button" class="sm msc">Clear</button></div>`;
-  const b=root.querySelector('.msb'),p=root.querySelector('.msp');
+  root.innerHTML='<button type="button" class="msb"></button><div class="msp" hidden><div class="msl"></div><button type="button" class="sm msc">Clear</button></div>';
+  const b=root.querySelector('.msb'),p=root.querySelector('.msp'),l=root.querySelector('.msl');
   const upd=()=>{
-    b.textContent=label+': '+(set.size===0?'All':set.size===1?opts.find(o=>o.v===[...set][0]).t:set.size+' selected');
+    const names=[...set].map(v=>(opts.find(o=>o.v===v)||{t:v}).t);
+    b.textContent=label+': '+(names.length===0?'All':names.length===1?names[0]:names.length+' selected');
     b.classList.toggle('on',set.size>0);
+  };
+  MSF[id]=n=>{
+    const k=JSON.stringify(n);if(k===key)return;
+    key=k;opts=n;
+    [...set].forEach(v=>{if(!n.some(o=>o.v===v))set.delete(v)});
+    l.innerHTML=n.map(o=>`<label><input type="checkbox" value="${esc(o.v)}" ${set.has(o.v)?'checked':''}> ${esc(o.t)}</label>`).join('');
+    upd();
   };
   b.onclick=e=>{e.stopPropagation();const open=p.hidden;closeAll();p.hidden=!open};
   p.onchange=e=>{const c=e.target;c.checked?set.add(c.value):set.delete(c.value);upd();go()};
-  const clear=()=>{set.clear();p.querySelectorAll('input').forEach(i=>i.checked=false);upd()};
+  const clear=()=>{set.clear();l.querySelectorAll('input').forEach(i=>i.checked=false);upd()};
   root.querySelector('.msc').onclick=()=>{clear();go()};
-  MSS.push(clear);upd();return set;
+  MSS.push(clear);MSF[id](init);return set;
 }
+const selShop=makeMS('ms-shop','Shop',SHOPS.map(v=>({v,t:v})));
 const selMem=makeMS('ms-mem','Members',Array.from({length:NMEM},(_,i)=>({v:String(i+1),t:'id'+(i+1)+(memN(i+1)?' '+memN(i+1):'')})));
 const selEra=makeMS('ms-era','Era',ERAS.map(e=>({v:e,t:e})));
 const selRound=makeMS('ms-round','Round',ROUNDS.map(e=>({v:e,t:e})));
@@ -245,17 +261,13 @@ function inRange(d){
 function render(){
   const q=norm($('q').value.trim()),ib=admin?RAW:'';
   const shops=[...new Set([...SHOPS,...items.map(i=>i.shop)].filter(Boolean))].sort((a,b)=>norm(a)<norm(b)?-1:1);
-  const sel=$('s-shop'),cur=sel.value;
-  sel.innerHTML='<option value="">All shops</option>'+shops.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
-  sel.value=shops.includes(cur)?cur:'';
+  MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
-  const fs=sel.value;
-  sel.classList.toggle('on',!!fs);
   const toks=q.split(/\s+/).filter(Boolean);
-  const list=items.filter(i=>inRange(i.date)&&(!fs||i.shop===fs)&&(!selMem.size||selMem.has(String(i.mem)))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))
+  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||selMem.has(String(i.mem)))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))
     &&(!toks.length||(h=>toks.every(t=>/^id\d+$/.test(t)?memL(i.mem)===t:h.includes(t)))(norm(i.shop+' '+memL(i.mem)+' '+memN(i.mem)+' '+(i.era||'')+' '+(i.round||'')+' '+i.date))));
-  list.sort((a,b)=>(a.date||'')<(b.date||'')?-1:(a.date||'')>(b.date||'')?1:0);
-  if(sortD==='desc')list.reverse();
+  /* by event date; within the same date: id1 first ... id24 last */
+  list.sort((a,b)=>{const da=a.date||'',db=b.date||'';if(da!==db)return sortD==='desc'?(da<db?1:-1):(da<db?-1:1);return (a.mem||999)-(b.mem||999)});
   $('s-date').value=sortD;
   $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card"><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
    <div class="shop" title="${esc(i.shop)}">${esc(i.shop)||'—'}</div><div class="mem">${memL(i.mem)}</div>
@@ -301,8 +313,7 @@ document.addEventListener('click',e=>{if(!$('cal').contains(e.target))$('cal').h
 
 /* filters */
 $('s-date').onchange=e=>{sortD=e.target.value;go()};
-$('s-shop').onchange=go;
-$('reset').onclick=()=>{$('q').value='';range=null;ext=false;$('s-shop').value='';MSS.forEach(f=>f());sortD='desc';go()};
+$('reset').onclick=()=>{$('q').value='';range=null;ext=false;MSS.forEach(f=>f());sortD='desc';go()};
 $('q').addEventListener('input',go);
 
 /* ===== GitHub as the database (admin only) ===== */
