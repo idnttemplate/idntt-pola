@@ -16,7 +16,8 @@ header{padding:20px 32px 8px;max-width:1400px;margin:0 auto;display:flex;justify
 h1{font-size:30px;line-height:1.15;margin:0;color:var(--h1);font-weight:700}h1 small{display:block;font-size:13px;color:var(--mut);font-weight:400}
 main{max-width:1400px;margin:0 auto;padding:8px 32px 40px}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px;align-items:center}
-.sortbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+.sortbar{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:10px;align-items:stretch}
+.sortbar>*{flex:1 1 0;min-width:0}
 .sortbar label{font-size:13px;color:var(--mut);display:flex;align-items:center;gap:6px}
 input,select,button,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px 12px}
 input[type=search]{flex:1 1 220px;min-width:0}
@@ -77,11 +78,21 @@ dialog input,dialog select,dialog textarea{width:100%}
 .cg button.end::after{background:#fff}
 .ext{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;cursor:pointer}
 .ext input{width:auto;padding:0;margin:0}
-#aboutdlg{width:50vw;min-height:50vh;padding:28px 34px;font-size:16px;line-height:1.6}
-#aboutdlg[open]{display:flex;flex-direction:column}
-#aboutdlg h3{font-size:24px}
-#aboutdlg .ab-close{margin-top:auto;align-self:flex-end}
-@media (max-width:700px){#aboutdlg{width:92vw}}
+#aboutdlg,#tpldlg,#notesdlg{width:50vw;min-height:50vh;padding:28px 34px;font-size:16px;line-height:1.6}
+#aboutdlg[open],#tpldlg[open],#notesdlg[open]{display:flex;flex-direction:column}
+#aboutdlg h3,#tpldlg h3,#notesdlg h3{font-size:24px}
+#aboutdlg .ab-close,#tpldlg .ab-close,#notesdlg .ab-close{margin-top:auto;align-self:flex-end}
+@media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg{width:92vw}}
+.lnk{display:inline-block;background:#fff;color:var(--ac);font-weight:700;font-size:14px;padding:8px 18px;border-radius:10px;text-decoration:none}
+#notesdlg{background:linear-gradient(135deg,#ffd1f0 0%,#c9d6ff 25%,#c8fff0 50%,#fff7c2 75%,#e5c9ff 100%);color:#111;border:1px solid rgba(255,255,255,.7)}
+#notesdlg .ab-close{background:#fff;color:#111;border:1px solid #111;font-weight:700}
+.holo{background:linear-gradient(135deg,#ffd1f0,#c9d6ff,#c8fff0,#fff7c2,#e5c9ff,#ffd1f0);background-size:220% 220%;animation:holo 6s ease infinite;color:#000;border:1px solid rgba(0,0,0,.25);font-weight:700}
+@keyframes holo{0%,100%{background-position:0 50%}50%{background-position:100% 50%}}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 8px;max-height:150px;overflow:auto;border:1px solid var(--bd);border-radius:10px;padding:6px}
+.mg label{display:flex;gap:6px;align-items:center;margin:0;font-size:13px;color:var(--tx)}
+.mg input{width:auto;padding:0;margin:0}
+#bulk .mg{width:min(520px,90vw);max-height:110px}
+.card .mem{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card{position:relative}
 .card .pick{position:absolute;top:6px;left:6px;width:22px;height:22px;padding:0;margin:0;z-index:2;accent-color:var(--ac);cursor:pointer}
 #bulk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ac2);border:1px solid var(--ac);border-radius:12px;padding:10px 12px;margin:8px 0;position:sticky;top:8px;z-index:15}
@@ -90,9 +101,10 @@ dialog input,dialog select,dialog textarea{width:100%}
 .brand{display:flex;align-items:center;gap:14px;min-width:0}
 .logo{width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none}
 a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-weight:700}
-.sortbar select,.sortbar .msb,.sortbar #reset{width:210px;max-width:none;height:40px;font-size:14px;padding:0 12px;text-align:left}
-.sortbar #reset{text-align:center}
-@media (max-width:700px){.sortbar>*{flex:1 1 44%}.sortbar select,.sortbar .msb,.sortbar #reset{width:100%}}
+.sortbar select,.sortbar .msb,.sortbar #reset,.sortbar #unsorted{width:100%;max-width:none;height:36px;font-size:13px;padding:0 8px;text-align:center;text-align-last:center}
+.sortbar #unsorted.on{background:var(--ac2);border-color:var(--ac)}
+@media (max-width:1000px){.sortbar{flex-wrap:wrap}.sortbar>*{flex:1 1 30%}}
+@media (max-width:520px){.sortbar>*{flex:1 1 44%}}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -118,9 +130,9 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 <header>
   <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small></h1></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-    <a class="hb" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
-    <a class="hb" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
     <button id="about" class="sm pri">About</button>
+    <button id="notes" class="sm holo">Notes</button>
+    <button id="tpl" class="sm pri">Template</button>
     <button id="theme" class="sm pri" title="Switch theme">Theme: 🌙 Dark</button>
     <button id="sign" class="sm pri">Sign in</button>
   </div>
@@ -136,17 +148,18 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   </div>
   <div class="sortbar">
     <select id="s-date"><option value="asc">Sort by: A–Z (oldest first)</option><option value="desc">Sort by: Z–A (newest first)</option><option value="first">Sort by: first member (id1 → id24)</option><option value="last">Sort by: last member (id24 → id1)</option></select>
-    <div id="ms-shop"></div>
-    <div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div>
+    <div id="ms-shop"></div><div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div><div id="ms-type"></div>
     <button id="reset">Reset filters</button>
+    <button id="unsorted" class="adm">Unsorted</button>
   </div>
   <div id="bulk" class="adm" hidden>
     <b id="bkn"></b>
-    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Member</option><option value="era">Era</option><option value="round">Round</option><option value="date">Date</option><option value="set">Set</option></select>
+    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option></select>
     <span id="bkval"></span>
     <button class="pri sm" id="bkapply">Apply to selected</button>
     <button class="sm" id="bkall">Select all shown results</button>
     <button class="sm" id="bkclr">Clear selection</button>
+    <button class="sm" id="bkdel" style="color:#fff;background:var(--danger);border-color:var(--danger)">Delete selected</button>
   </div>
   <div class="cnt" id="cnt"></div>
   <div class="grid" id="grid"></div>
@@ -160,6 +173,24 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <div class="warn">⚠️ admin sign in for updating only!</div>
   <div id="sgerr" class="sgerr"></div>
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="sgcancel">Cancel</button><button class="go" id="sgok">Sign in</button></div>
+</dialog>
+
+<dialog id="tpldlg" class="signd">
+  <h3 style="margin:0 0 14px">Template</h3>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
+    <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
+  </div>
+  <button class="go ab-close" id="tplclose">Close</button>
+</dialog>
+
+<dialog id="notesdlg">
+  <h3 style="margin:0 0 14px">notes</h3>
+  <p style="margin:8px 0">acronyms explain:</p>
+  <p style="margin:8px 0">f2f: Offline Fansign</p>
+  <p style="margin:8px 0">group vce: Online Group Video Call</p>
+  <p style="margin:8px 0">1:1 vce: Online 1:1 Video Call</p>
+  <button class="ab-close" id="notesclose">Close</button>
 </dialog>
 
 <dialog id="aboutdlg" class="signd">
@@ -176,9 +207,10 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <div id="filerow"><label>Images (up to 100 per save)</label><input type="file" id="file" accept="image/*" multiple><div id="prog" class="cnt"></div></div>
   <label>Shop</label><input id="fshop" list="shops" placeholder="Shop name">
   <datalist id="shops"></datalist>
-  <label>Member</label><select id="fmem"></select>
+  <label>Members (tick one or more)</label><div id="fmemw"></div>
   <label>Era</label><select id="fera"></select>
   <label>Round</label><select id="fround"></select>
+  <label>Type</label><select id="ftype"></select>
   <label>Date</label><input type="date" id="fdate" min="2025-08-01">
   <label>Set (admin only, optional: 1, 2, 3…)</label><input type="number" id="fset" min="1" placeholder="e.g. 1">
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
@@ -196,6 +228,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
       <div><div class="k">Date</div><div class="v" id="vdate"></div></div>
       <div><div class="k">Era</div><div class="v" id="vera"></div></div>
       <div><div class="k">Round</div><div class="v" id="vround"></div></div>
+      <div><div class="k">Type</div><div class="v" id="vtype"></div></div>
     </div>
   </div>
 </dialog>
@@ -209,23 +242,30 @@ if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.host
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
 const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
-const ROUNDS=['Album Inclusion','Luckydraw','POB',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* 21 items */
+const ROUNDS=['Album Inclusion','etc.','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0')];   /* letters A-Z first, numbers after */
+const TYPES=['f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
 const NMEM=24,PAGE=120,MIN={y:2025,m:7};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 /* ===== state ===== */
 const GH=`https://api.github.com/repos/${CFG.owner}/${CFG.repo}`;
 const RAW=`https://raw.githubusercontent.com/${CFG.owner}/${CFG.repo}/${CFG.branch}/`;
-let items=[],lastList=[],picked=new Set(),admin=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
+let items=[],lastList=[],picked=new Set(),admin=false,unsortedOnly=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
 try{token=localStorage.getItem('pob-gh')||''}catch(e){}
 calM=new Date(Math.max(calM,new Date(MIN.y,MIN.m,1)));calM.setDate(1);
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const memL=n=>n?'id'+n:'—';
-const memN=n=>n&&NAMES[n-1]?NAMES[n-1]:'';
 const fmt=d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'No date';
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const addD=(s,n)=>{const x=new Date(s+'T00:00');x.setDate(x.getDate()+n);return ds(x)};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const memN=n=>n&&NAMES[n-1]?NAMES[n-1]:'';
+/* items support several members (mems). Old items with a single "mem" are converted automatically. */
+const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const o={...i,mems:[...new Set(m.map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b)};delete o.mem;return o};
+const mm=i=>i.mems||[];
+const memTxt=i=>mm(i).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
+const typeShow=i=>i.type&&i.type!=='unsorted'?i.type:'';
+const titleOf=i=>[i.shop,i.round,typeShow(i)].filter(Boolean).join(' ');
+const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era);   /* shop/member/round/date/era (set and type not counted) */
 
 /* theme */
 let theme='dark';
@@ -237,13 +277,15 @@ function applyTheme(){
 $('theme').onclick=()=>{theme=theme==='dark'?'light':'dark';try{localStorage.setItem('pob-theme',theme)}catch(e){}applyTheme()};
 applyTheme();
 
-const memOpts=f=>`<option value="">${f}</option>`+Array.from({length:NMEM},(_,i)=>`<option value="${i+1}">id${i+1}${memN(i+1)?' '+esc(memN(i+1)):''}</option>`).join('');
 const listOpts=(a,f)=>`<option value="">${f}</option>`+a.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
-$('fmem').innerHTML=memOpts('—');$('fera').innerHTML=listOpts(ERAS,'—');$('fround').innerHTML=listOpts(ROUNDS,'—');
+const typeOpts='<option value="">unsorted</option>'+TYPES.map(e=>`<option value="${e}">${e}</option>`).join('');
+const memGrid=(sel=[])=>`<div class="mg">${Array.from({length:NMEM},(_,i)=>`<label><input type="checkbox" value="${i+1}" ${sel.includes(i+1)?'checked':''}> id${i+1}${memN(i+1)?' '+esc(memN(i+1)):''}</label>`).join('')}</div>`;
+const gridVals=el=>[...el.querySelectorAll('input:checked')].map(c=>+c.value);
+$('fera').innerHTML=listOpts(ERAS,'—');$('fround').innerHTML=listOpts(ROUNDS,'—');$('ftype').innerHTML=typeOpts;
+
 /* multi-select filters */
-const MSS=[];
+const MSS=[],MSF={};
 const closeAll=()=>document.querySelectorAll('.msp').forEach(p=>p.hidden=true);
-const MSF={};
 function makeMS(id,label,init){
   const root=$(id),set=new Set();let opts=[],key='';
   root.className='ms';
@@ -271,6 +313,7 @@ const selShop=makeMS('ms-shop','Shop',SHOPS.map(v=>({v,t:v})));
 const selMem=makeMS('ms-mem','Members',Array.from({length:NMEM},(_,i)=>({v:String(i+1),t:'id'+(i+1)+(memN(i+1)?' '+memN(i+1):'')})));
 const selEra=makeMS('ms-era','Era',ERAS.map(e=>({v:e,t:e})));
 const selRound=makeMS('ms-round','Round',ROUNDS.map(e=>({v:e,t:e})));
+const selType=makeMS('ms-type','Type',[...TYPES.map(e=>({v:e,t:e})),{v:'__none',t:'unsorted'}]);
 document.addEventListener('click',e=>{if(!e.target.closest('.ms'))closeAll()});
 
 function inRange(d){
@@ -279,38 +322,65 @@ function inRange(d){
   if(ext){lo=addD(lo,-2);hi=addD(hi,2)}
   return d>=lo&&d<=hi;
 }
+/* date search: 2507, 0725, 260725, 20260725, 25072026 ... (separators . / - ignored) */
+function dateForms(d){
+  if(!d)return [];
+  const [y,m,dd]=d.split('-'),yy=y.slice(2);
+  return [dd+m,m+dd,yy+m+dd,y+m+dd,dd+m+y,dd+m+yy,m+dd+yy,m+dd+y];
+}
+function okTok(i,t,h){
+  if(/^id\d+$/.test(t))return mm(i).includes(+t.slice(2));          /* id1 matches only id1, not id12 */
+  if(/^[\d.\/-]+$/.test(t)){
+    const d=t.replace(/[.\/-]/g,'');
+    if(d.length>=4&&d.length<=8&&dateForms(i.date).some(f=>f.startsWith(d)))return true;
+  }
+  return h.includes(t);
+}
+/* a set number may not give the same member twice within one shop + round */
+function setConflict(arr){
+  const g={};
+  for(const i of arr){
+    if(!i.set||!i.shop||!i.round)continue;
+    const k=[i.shop,i.round,i.set].join('|');g[k]=g[k]||{};
+    for(const n of mm(i)){
+      if(g[k][n]&&g[k][n]!==i.id)return `Set ${i.set} of ${i.shop} ${i.round} already contains id${n}. Please use a different set number.`;
+      g[k][n]=i.id;
+    }
+  }
+  return '';
+}
+const chk=a=>{const m=setConflict(a);if(m)throw new Error(m);return a};
+
 function render(){
   const q=norm($('q').value.trim()),ib=admin?RAW:'';
   const shops=[...new Set([...SHOPS,...items.map(i=>i.shop)].filter(Boolean))].sort((a,b)=>norm(a)<norm(b)?-1:1);
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
   const toks=q.split(/\s+/).filter(Boolean);
-  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||selMem.has(String(i.mem)))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))
-    &&(!toks.length||(h=>toks.every(t=>/^id\d+$/.test(t)?memL(i.mem)===t:h.includes(t)))(norm(i.shop+' '+memL(i.mem)+' '+memN(i.mem)+' '+(i.era||'')+' '+(i.round||'')+' '+i.date))));
-  /* by event date; within the same date: id1 first ... id24 last */
+  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||selType.has(i.type||'__none'))&&(!unsortedOnly||isUnsorted(i))
+    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,i.type,i.date].filter(Boolean).join(' ')))));
+  const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
-    const da=a.date||'',db=b.date||'',sa=a.set||9999,sb=b.set||9999,ma=a.mem||999,mb=b.mem||999;
-    if(sortD==='first'||sortD==='last'){
-      if(ma!==mb){if(!a.mem!==!b.mem)return a.mem?-1:1;return sortD==='first'?ma-mb:mb-ma}
-      if(da!==db)return da<db?1:-1;
-      return sa-sb;
-    }
+    const da=a.date||'',db=b.date||'',sa=a.set||9999,sb=b.set||9999;
+    if(sortD==='first'){if(mn(a)!==mn(b))return mn(a)-mn(b);if(da!==db)return da<db?1:-1;return sa-sb}
+    if(sortD==='last'){if(mx(a)!==mx(b))return mx(b)-mx(a);if(da!==db)return da<db?1:-1;return sa-sb}
     if(da!==db)return sortD==='desc'?(da<db?1:-1):(da<db?-1:1);   /* 1. date */
     if(sa!==sb)return sa-sb;                                       /* 2. set (admin-numbered) */
-    return ma-mb;                                                  /* 3. member id1 -> id24 */
+    return mn(a)-mn(b);                                            /* 3. member id1 -> id24 */
   });
   lastList=list;
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
   $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}<img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
-   <div class="shop" title="${esc((i.shop||'')+(i.round?' '+i.round:''))}">${esc((i.shop||'—')+(i.round?' '+i.round:''))}</div><div class="mem">${esc(memL(i.mem)+(memN(i.mem)?' '+memN(i.mem):''))}</div>
+   <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
   $('empty').hidden=list.length>0;$('more').hidden=list.length<=shown;
-  updBulk();
   $('cnt').textContent=`${list.length} pola found!`;
+  $('unsorted').textContent='Unsorted ('+items.filter(isUnsorted).length+')';$('unsorted').classList.toggle('on',unsortedOnly);
   $('calbtn').textContent='📅 '+(range?(range.b&&range.b!==range.a?fmt(range.a<range.b?range.a:range.b)+' → '+fmt(range.a<range.b?range.b:range.a):fmt(range.a))+(ext?' ±2d':''):'Date');
   $('calbtn').classList.toggle('on',!!range);
+  updBulk();
 }
 const go=()=>{shown=PAGE;render()};
 $('more').onclick=()=>{shown+=PAGE;render()};
@@ -347,7 +417,8 @@ document.addEventListener('click',e=>{if(!$('cal').contains(e.target))$('cal').h
 
 /* filters */
 $('s-date').onchange=e=>{sortD=e.target.value;go()};
-$('reset').onclick=()=>{$('q').value='';range=null;ext=false;MSS.forEach(f=>f());sortD='desc';go()};
+$('unsorted').onclick=()=>{unsortedOnly=!unsortedOnly;go()};
+$('reset').onclick=()=>{$('q').value='';range=null;ext=false;unsortedOnly=false;MSS.forEach(f=>f());sortD='desc';go()};
 $('q').addEventListener('input',go);
 
 /* ===== GitHub as the database (admin only) ===== */
@@ -362,7 +433,7 @@ async function rawItems(){
   const r=await fetch(`${GH}/contents/data/items.json?ref=${CFG.branch}`,{headers:hdr({Accept:'application/vnd.github.raw+json'}),cache:'no-store'});
   if(r.status===404)return [];
   if(!r.ok)throw new Error('HTTP '+r.status);
-  return JSON.parse(await r.text()||'[]');
+  return JSON.parse(await r.text()||'[]').map(fixI);
 }
 const toB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 const setProg=t=>$('prog').textContent=t;
@@ -394,16 +465,16 @@ const DONE='Saved! Visitors will see the change in about 1–2 minutes, after Gi
 function openDlg(it){
   if(!admin)return;
   editId=it?it.id:null;$('dt').textContent=it?'Edit':'Add images';$('filerow').hidden=!!it;
-  $('fshop').value=it?.shop||'';$('fmem').value=it?.mem||'';$('fera').value=it?.era||'';$('fround').value=it?.round||'';
+  $('fshop').value=it?.shop||'';$('fmemw').innerHTML=memGrid(it?mm(it):[]);$('fera').value=it?.era||'';$('fround').value=it?.round||'';$('ftype').value=it?.type||'';
   $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('file').value='';setProg('');
   $('dlg').showModal();
 }
 $('save').onclick=async()=>{
   if(!admin)return;
-  const meta={shop:$('fshop').value.trim(),mem:parseInt($('fmem').value)||null,era:$('fera').value,round:$('fround').value,date:$('fdate').value,set:parseInt($('fset').value)||null};
+  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,type:$('ftype').value,date:$('fdate').value,set:parseInt($('fset').value)||null};
   $('save').disabled=true;
   try{
-    if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>a.map(i=>i.id===editId?{...i,...meta}:i)})}
+    if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>chk(a.map(i=>i.id===editId?{...i,...meta}:i))})}
     else{
       const files=[...$('file').files];
       if(!files.length){alert('Choose at least one image');return}
@@ -414,7 +485,7 @@ $('save').onclick=async()=>{
         const id=uid(),[full,th]=await Promise.all([shrink(f,1400,.85),shrink(f,360,.8)]);
         add.push({path:`img/${id}.jpg`,blob:full},{path:`th/${id}.jpg`,blob:th});news.push({id,...meta});
       }
-      await commit(`Add ${files.length} pola`,{add,mutate:a=>[...a,...news]});
+      await commit(`Add ${files.length} pola`,{add,mutate:a=>chk([...a,...news])});
     }
     $('dlg').close();render();alert(DONE);
   }catch(e){alert('Failed: '+e.message)}
@@ -423,15 +494,16 @@ $('save').onclick=async()=>{
 $('cancel').onclick=()=>$('dlg').close();
 $('add').onclick=()=>openDlg();
 
-/* bulk edit (admin only) */
+/* bulk edit / delete (admin only) */
 function updBulk(){$('bulk').hidden=!(admin&&picked.size);$('bkn').textContent=picked.size+' selected'}
 function bkInput(){
   const f=$('bkfield').value;
   $('bkval').innerHTML={
     shop:'<input id="bkv" list="shops" placeholder="Shop name">',
-    mem:`<select id="bkv">${memOpts('—')}</select>`,
+    mem:memGrid([]),
     era:`<select id="bkv">${listOpts(ERAS,'—')}</select>`,
     round:`<select id="bkv">${listOpts(ROUNDS,'—')}</select>`,
+    type:`<select id="bkv">${typeOpts}</select>`,
     date:'<input id="bkv" type="date" min="2025-08-01">',
     set:'<input id="bkv" type="number" min="1" placeholder="set no. (blank = clear)" style="width:190px">'
   }[f];
@@ -442,20 +514,31 @@ $('bkall').onclick=()=>{lastList.forEach(i=>picked.add(i.id));render()};
 $('bkclr').onclick=()=>{picked.clear();render()};
 $('bkapply').onclick=async()=>{
   if(!admin||!picked.size)return;
-  const f=$('bkfield').value;let v=$('bkv').value.trim();
-  if(f==='mem'||f==='set')v=parseInt(v)||null;
-  if(!confirm(`Set ${f} to "${v===null||v===''?'(empty)':v}" for ${picked.size} pola?`))return;
+  const f=$('bkfield').value,key=f==='mem'?'mems':f;let v;
+  if(f==='mem')v=gridVals($('bkval'));
+  else{v=$('bkv').value.trim();if(f==='set')v=parseInt(v)||null}
+  const shown_=Array.isArray(v)?v.map(n=>'id'+n).join(', '):v;
+  if(!confirm(`Set ${f} to "${shown_||'(empty)'}" for ${picked.size} pola?`))return;
   const ids=new Set(picked);
   $('bkapply').disabled=true;
-  try{await commit(`Bulk edit ${ids.size} pola`,{mutate:a=>a.map(i=>ids.has(i.id)?{...i,[f]:v}:i)});picked.clear();render();alert(DONE)}
+  try{await commit(`Bulk edit ${ids.size} pola`,{mutate:a=>chk(a.map(i=>ids.has(i.id)?{...i,[key]:v}:i))});picked.clear();render();alert(DONE)}
   catch(e){alert('Failed: '+e.message)}
   finally{$('bkapply').disabled=false}
+};
+$('bkdel').onclick=async()=>{
+  if(!admin||!picked.size)return;
+  if(!confirm(`Delete ${picked.size} selected pola permanently? This cannot be undone.`))return;
+  const ids=new Set(picked),del=[...ids].flatMap(id=>[`img/${id}.jpg`,`th/${id}.jpg`]);
+  $('bkdel').disabled=true;
+  try{await commit(`Delete ${ids.size} pola`,{del,mutate:a=>a.filter(i=>!ids.has(i.id))});picked.clear();render();alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('bkdel').disabled=false}
 };
 
 /* detail view */
 function openView(it){
-  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vmem').textContent=it.mem?memL(it.mem)+(memN(it.mem)?' '+memN(it.mem):''):'—';
-  $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vdate').textContent=fmt(it.date);
+  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vmem').textContent=memTxt(it)||'—';
+  $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=typeShow(it)||'—';$('vdate').textContent=fmt(it.date);
   $('view').scrollTop=0;$('view').showModal();
 }
 $('vx').onclick=()=>$('view').close();
@@ -477,7 +560,7 @@ async function verify(t){
   if(!r.ok)throw 0;
   const j=await r.json();if(j.permissions&&j.permissions.push===false)throw 0;
 }
-function setAdmin(v){admin=v;document.body.classList.toggle('admin',v);$('sign').textContent=v?'Sign out':'Sign in';load()}
+function setAdmin(v){admin=v;if(!v){unsortedOnly=false;picked.clear()}document.body.classList.toggle('admin',v);$('sign').textContent=v?'Sign out':'Sign in';load()}
 $('sign').onclick=()=>{
   if(admin){token='';try{localStorage.removeItem('pob-gh')}catch(e){}setAdmin(false);return}
   $('sgerr').textContent='';$('signdlg').showModal();
@@ -492,16 +575,19 @@ $('sgok').onclick=async()=>{
 };
 $('about').onclick=()=>$('aboutdlg').showModal();
 $('abclose').onclick=()=>$('aboutdlg').close();
+$('tpl').onclick=()=>$('tpldlg').showModal();
+$('tplclose').onclick=()=>$('tpldlg').close();
+$('notes').onclick=()=>$('notesdlg').showModal();
+$('notesclose').onclick=()=>$('notesdlg').close();
 
 async function load(){
   try{
     if(admin)items=await rawItems();
-    else{const r=await fetch('data/items.json?'+Date.now(),{cache:'no-store'});items=r.ok?await r.json():[]}
+    else{const r=await fetch('data/items.json?'+Date.now(),{cache:'no-store'});items=r.ok?(await r.json()).map(fixI):[]}
     $('empty').textContent='No pola yet.';
   }catch(e){items=[];$('empty').textContent='Could not load data.'}
   render();
 }
 load();
 if(token&&CFG.owner)verify(token).then(()=>setAdmin(true)).catch(()=>{});
-
 </script></body></html>
