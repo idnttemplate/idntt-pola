@@ -83,7 +83,10 @@ dialog input,dialog select,dialog textarea{width:100%}
 #aboutdlg h3,#tpldlg h3,#notesdlg h3{font-size:24px}
 #aboutdlg .ab-close,#tpldlg .ab-close,#notesdlg .ab-close{margin-top:auto;align-self:flex-end}
 @media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg{width:92vw}}
-.lnk{display:inline-block;background:#fff;color:var(--ac);font-weight:700;font-size:14px;padding:8px 18px;border-radius:10px;text-decoration:none}
+.lnks{display:flex;gap:16px;flex:1;margin:6px 0 18px}
+.lnk{flex:1;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;border:1px solid rgba(255,255,255,.35);font-weight:700;font-size:clamp(18px,3vw,28px);border-radius:16px;text-decoration:none;min-height:120px}
+.lnk:hover{background:#1a1a1a}
+@media (max-width:700px){.lnks{flex-direction:column}}
 #notesdlg{background:linear-gradient(135deg,#ffd1f0 0%,#c9d6ff 25%,#c8fff0 50%,#fff7c2 75%,#e5c9ff 100%);color:#111;border:1px solid rgba(255,255,255,.7)}
 #notesdlg .ab-close{background:#fff;color:#111;border:1px solid #111;font-weight:700}
 .holo{background:linear-gradient(135deg,#ffd1f0,#c9d6ff,#c8fff0,#fff7c2,#e5c9ff,#ffd1f0);background-size:220% 220%;animation:holo 6s ease infinite;color:#000;border:1px solid rgba(0,0,0,.25);font-weight:700}
@@ -177,7 +180,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 
 <dialog id="tpldlg" class="signd">
   <h3 style="margin:0 0 14px">Template</h3>
-  <div style="display:flex;gap:10px;flex-wrap:wrap">
+  <div class="lnks">
     <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
     <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
   </div>
@@ -197,7 +200,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <h3 style="margin:0 0 14px">About</h3>
   <p style="margin:8px 0">© <a href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a> on X</p>
   <p style="margin:8px 0">this website is currently on demo mode, other information about date/round will be updated later.</p>
-  <p style="margin:8px 0">notes: type of events (fancall, fansign, etc.) will not be updated for now.</p>
+  <p style="margin:8px 0">types of events (f2f, vce, etc.) will be updated for some, while the rest won't be updated for now</p>
   <p style="margin:8px 0">physical objekts will not be updated</p>
   <button class="go ab-close" id="abclose">Close</button>
 </dialog>
@@ -242,8 +245,9 @@ if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.host
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
 const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
-const ROUNDS=['Album Inclusion','etc.','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0')];   /* letters A-Z first, numbers after */
-const TYPES=['f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
+const ROUNDS=['Album Inclusion','Broadcast','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
+const TYPES=['f2f','group vce','1:1 vce','album','luckydraw','pob','showcase','broadcast'];   /* items without a type count as "unsorted" */
+const HIDE_TYPES=['album','luckydraw','pob','showcase','broadcast'];   /* these types are not repeated in the card title */
 const NMEM=24,PAGE=120,MIN={y:2025,m:7};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 /* ===== state ===== */
@@ -253,6 +257,9 @@ let items=[],lastList=[],picked=new Set(),admin=false,unsortedOnly=false,sortD='
 try{token=localStorage.getItem('pob-gh')||''}catch(e){}
 calM=new Date(Math.max(calM,new Date(MIN.y,MIN.m,1)));calM.setDate(1);
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+/* search keywords that mean the same thing */
+const ALIAS=[[/\b(fan\s*sign|fansign|fs|offline)\b/g,'f2f'],[/\b(video\s*call|video|fan\s*call|fancall|fc)\b/g,'vce'],[/\bld\b/g,'luckydraw']];
+const alias=q=>ALIAS.reduce((t,[re,to])=>t.replace(re,to),q);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'No date';
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -263,7 +270,7 @@ const memN=n=>n&&NAMES[n-1]?NAMES[n-1]:'';
 const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const o={...i,mems:[...new Set(m.map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b)};delete o.mem;return o};
 const mm=i=>i.mems||[];
 const memTxt=i=>mm(i).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
-const typeShow=i=>i.type&&i.type!=='unsorted'?i.type:'';
+const typeShow=i=>i.type&&i.type!=='unsorted'&&!HIDE_TYPES.includes(i.type)?i.type:'';
 const titleOf=i=>[i.shop,i.round,typeShow(i)].filter(Boolean).join(' ');
 const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era);   /* shop/member/round/date/era (set and type not counted) */
 
@@ -293,7 +300,7 @@ function makeMS(id,label,init){
   const b=root.querySelector('.msb'),p=root.querySelector('.msp'),l=root.querySelector('.msl');
   const upd=()=>{
     const names=[...set].map(v=>(opts.find(o=>o.v===v)||{t:v}).t);
-    b.textContent=label+': '+(names.length===0?'All':names.length===1?names[0]:names.length+' selected');
+    b.textContent=label+': '+(names.length===0?'Any':names.length===1?names[0]:names.length+' selected');
     b.classList.toggle('on',set.size>0);
   };
   MSF[id]=n=>{
@@ -352,7 +359,7 @@ function setConflict(arr){
 const chk=a=>{const m=setConflict(a);if(m)throw new Error(m);return a};
 
 function render(){
-  const q=norm($('q').value.trim()),ib=admin?RAW:'';
+  const q=alias(norm($('q').value.trim())),ib=admin?RAW:'';
   const shops=[...new Set([...SHOPS,...items.map(i=>i.shop)].filter(Boolean))].sort((a,b)=>norm(a)<norm(b)?-1:1);
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
@@ -538,7 +545,7 @@ $('bkdel').onclick=async()=>{
 /* detail view */
 function openView(it){
   $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vmem').textContent=memTxt(it)||'—';
-  $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=typeShow(it)||'—';$('vdate').textContent=fmt(it.date);
+  $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=(it.type&&it.type!=='unsorted'?it.type:'')||'—';$('vdate').textContent=fmt(it.date);
   $('view').scrollTop=0;$('view').showModal();
 }
 $('vx').onclick=()=>$('view').close();
