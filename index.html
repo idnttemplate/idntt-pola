@@ -245,9 +245,9 @@ if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.host
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
 const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
-const ROUNDS=['Album Inclusion','Broadcast','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
-const TYPES=['f2f','group vce','1:1 vce','album','luckydraw','pob','showcase','broadcast'];   /* items without a type count as "unsorted" */
-const HIDE_TYPES=['album','luckydraw','pob','showcase','broadcast'];   /* these types are not repeated in the card title */
+const ROUNDS=['Album Inclusion','Broadcast','Cafe','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
+const TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
+const HIDE_TYPES=['album','pob','showcase','broadcast','luckydraw','cafe'];   /* these types are not repeated in the card title */
 const NMEM=24,PAGE=120,MIN={y:2025,m:7};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 /* ===== state ===== */
@@ -272,6 +272,9 @@ const mm=i=>i.mems||[];
 const memTxt=i=>mm(i).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
 const typeShow=i=>i.type&&i.type!=='unsorted'&&!HIDE_TYPES.includes(i.type)?i.type:'';
 const titleOf=i=>[i.shop,i.round,typeShow(i)].filter(Boolean).join(' ');
+/* priority inside one date: album inclusion > pob > luckydraw > cafe > everything else */
+const kindOf=x=>{x=norm(x);if(x==='album'||x==='album inclusion')return 0;const k=['pob','luckydraw','cafe'].indexOf(x);return k<0?9:k+1};
+const rank=i=>Math.min(kindOf(i.round),kindOf(i.type));
 const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era);   /* shop/member/round/date/era (set and type not counted) */
 
 /* theme */
@@ -368,12 +371,13 @@ function render(){
     &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,i.type,i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
-    const da=a.date||'',db=b.date||'',sa=a.set||9999,sb=b.set||9999;
-    if(sortD==='first'){if(mn(a)!==mn(b))return mn(a)-mn(b);if(da!==db)return da<db?1:-1;return sa-sb}
-    if(sortD==='last'){if(mx(a)!==mx(b))return mx(b)-mx(a);if(da!==db)return da<db?1:-1;return sa-sb}
+    const da=a.date||'',db=b.date||'',ka=rank(a),kb=rank(b),sa=a.set||9999,sb=b.set||9999;
+    if(sortD==='first'){if(mn(a)!==mn(b))return mn(a)-mn(b);if(da!==db)return da<db?1:-1;return ka-kb||sa-sb}
+    if(sortD==='last'){if(mx(a)!==mx(b))return mx(b)-mx(a);if(da!==db)return da<db?1:-1;return ka-kb||sa-sb}
     if(da!==db)return sortD==='desc'?(da<db?1:-1):(da<db?-1:1);   /* 1. date */
-    if(sa!==sb)return sa-sb;                                       /* 2. set (admin-numbered) */
-    return mn(a)-mn(b);                                            /* 3. member id1 -> id24 */
+    if(ka!==kb)return ka-kb;                                       /* 2. album inclusion > pob > luckydraw > cafe > rest */
+    if(sa!==sb)return sa-sb;                                       /* 3. set (admin-numbered) */
+    return mn(a)-mn(b);                                            /* 4. member id1 -> id24 */
   });
   lastList=list;
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
