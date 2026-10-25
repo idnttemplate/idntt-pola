@@ -609,7 +609,7 @@ const WL={
   user:{x:372,y:1882,w:1263,h:88},      /* purple bar of layer 4: "@username" */
   templates:[                           /* sorted by max; a template is chosen by number of pola on that image */
     {max:12,W:2000,H:2000,
-     bg:'wishlist/1_1.png',deco:'wishlist/1_3.png',          /* layer 1 (base) and layer 3 (decoration) */
+     bg:['wishlist/1_1.png','wishlist/1.1.png','1_1.png','1.1.png'],deco:['wishlist/1_3.png','wishlist/1.3.png','1_3.png','1.3.png'],   /* layer 1 (base) and layer 3 (decoration): the first file name that exists is used */
      cols:[84,395,706,1017,1328,1639],rows:[779,1367],sw:275,sh:413,   /* pola slots (from the layer 2 mask) */
      name:{dy:-72,h:58},round:{dy:427,h:58},                  /* yellow boxes above / below each slot */
      star:{dx:-55,dy:-16,w:112,h:109}}                        /* decoration that belongs to each slot */
@@ -632,6 +632,7 @@ function wishLayout(t,n){
   return out;
 }
 /*WL-PURE-END*/
+const loadAny=async list=>{for(const s of [].concat(list)){try{return await loadImg(s)}catch(e){}}throw new Error('template image not found')};
 const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>res(im);im.onerror=()=>rej(new Error('load '+src));im.src=src});
 function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
 function drawFit(g,text,cx,cy,w,max,min,weight){
@@ -645,7 +646,7 @@ function drawFit(g,text,cx,cy,w,max,min,weight){
 async function drawWish(t,list,user){
   const c=document.createElement('canvas');c.width=t.W;c.height=t.H;
   const g=c.getContext('2d');
-  const [bg,deco]=await Promise.all([loadImg(t.bg),loadImg(t.deco).catch(()=>null)]);
+  const [bg,deco]=await Promise.all([loadAny(t.bg),loadAny(t.deco).catch(()=>null)]);
   const imgs=await Promise.all(list.map(i=>loadImg('th/'+i.id+'.jpg').catch(()=>null)));
   g.drawImage(bg,0,0,t.W,t.H);                                          /* layer 1: base */
   const lay=wishLayout(t,list.length);
@@ -692,7 +693,7 @@ async function buildWish(){
     }
     if(seq!==wlSeq)return;
     wlUrls.forEach(u=>URL.revokeObjectURL(u));wlUrls=urls;box.innerHTML=html.join('');
-  }catch(e){box.innerHTML='<p class="cnt">Could not create the image. Please check that the template images are in the wishlist folder.</p>'}
+  }catch(e){box.innerHTML='<p class="cnt">Could not create the image: '+esc(e.message)+'. Please check that wishlist/1_1.png and wishlist/1_3.png (underscore in the name) are in the repository.</p>'}
 }
 function openWL(){
   try{$('wluser').value=localStorage.getItem('pob-wluser')||''}catch(e){}
