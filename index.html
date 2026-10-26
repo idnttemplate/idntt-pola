@@ -3,7 +3,7 @@
 <link rel="icon" type="image/jpeg" href="logo.jpg"><link rel="apple-touch-icon" href="logo.jpg">
 <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("pob-theme")==="light"?"light":"dark")}catch(e){document.documentElement.setAttribute("data-theme","dark")}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&family=Yellowtail&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--tx:#161a26;--mut:#6a7086;--bd:#dfe3ee;--ac:#1d3fa8;--act:#1d3fa8;--ac2:#e6ecfb;--danger:#d63b3b;--h1:#1d3fa8;--cb:#111;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -109,8 +109,8 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 @media (max-width:1000px){.sortbar{flex-wrap:wrap}.sortbar>*{flex:1 1 30%}}
 @media (max-width:520px){.sortbar>*{flex:1 1 44%}}
 #wlguide p{margin:8px 0}
-.card .wl{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.9);color:#e04466;border:1px solid rgba(0,0,0,.25);font-size:16px;line-height:1;z-index:2;cursor:pointer}
-.card .wl.on{background:#e04466;color:#fff;border-color:#e04466}
+.card .wl{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:16px;line-height:1;z-index:2;cursor:pointer}
+.card .wl.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 #wlbar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;background:var(--ac);color:#fff;border-radius:99px;padding:8px 10px 8px 18px;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:14px;white-space:nowrap}
 #wlbar[hidden]{display:none}
 #wlbar button{background:#fff;color:var(--ac);border:0;border-radius:99px;padding:6px 14px;font-weight:700;font-size:13px}
@@ -196,10 +196,9 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 
 <dialog id="wlguide" class="signd">
   <h3 style="margin:0 0 14px">Wishlist guide</h3>
-  <p>1. Tap the ♡ on every pola you want to add to your wishlist.</p>
-  <p>2. Open your wishlist with the button at the bottom of the screen and type your username.</p>
-  <p>3. Download your image and share it!</p>
-  <p style="opacity:.8">(guide text will be updated later)</p>
+  <p>1. tap the ♡ on every pola you want to add to your wishlist.</p>
+  <p>2. open your wishlist with the button at the bottom of the screen and type your username.</p>
+  <p>3. download your image</p>
   <div style="margin-top:auto;display:flex;gap:10px;justify-content:flex-end"><button class="go" id="wlmake">Make my wishlist</button><button class="go" id="wlgclose">Close</button></div>
 </dialog>
 
@@ -209,7 +208,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <div id="wlitems" class="wlitems"></div>
   <div style="margin:6px 0"><button class="sm" id="wlclear">Clear all</button></div>
   <div id="wlprev"></div>
-  <p class="cnt">On a phone, press and hold the picture to save it if the download button does not work.</p>
+  <p class="cnt">on your phone, please press and hold the picture to save if the download button doesn't work!</p>
   <div style="display:flex;justify-content:flex-end;margin-top:10px"><button id="wlmkclose">Close</button></div>
 </dialog>
 
@@ -605,7 +604,10 @@ document.addEventListener('click',async e=>{
 /* ===== wishlist: images are built in the visitor's browser, nothing is stored on a server ===== */
 /*WL-PURE-START*/
 const WL={
-  color:'#2b3a55',font:'Lexend',
+  color:'#2b3a55',font:'Lexend',          /* username */
+  useDeco:false,                          /* layer 3 is switched off for now: set to true to bring it back */
+  fonts:{name:"'Yellowtail', cursive",shop:"'Bebas Neue', Impact, sans-serif"},   /* name = script like "my", shop = condensed like WISHLIST */
+  colors:{name:'#ff6f91',shop:'#409cb8'},   /* pink of the PRIORITY star, blue of the OTW star */
   user:{x:372,y:1882,w:1263,h:88},      /* purple bar of layer 4: "@username" */
   templates:[                           /* sorted by max; a template is chosen by number of pola on that image */
     {max:12,W:2000,H:2000,
@@ -643,10 +645,29 @@ function drawFit(g,text,cx,cy,w,max,min,weight){
   if(g.measureText(t).width>w){while(t.length>1&&g.measureText(t+'…').width>w)t=t.slice(0,-1);t+='…'}
   g.fillText(t,cx,cy);
 }
+function fitText(g,text,w,max,min,fam,weight){
+  const f=z=>`${weight} ${z}px ${fam}`;
+  let s=max;g.font=f(s);
+  while(s>min&&g.measureText(text).width>w){s-=1;g.font=f(s)}
+  let t=text;
+  if(g.measureText(t).width>w){while(t.length>1&&g.measureText(t+'…').width>w)t=t.slice(0,-1);t+='…'}
+  return {t,font:f(s)};
+}
+/* label above (dir -1) or below (dir +1) a slot. The text starts centred in its box, then moves
+   half of its gap towards the pola, so it sits closer to the picture. */
+function drawLabel(g,text,cx,boxTop,boxH,edgeY,dir,o){
+  const r=fitText(g,text,o.w,o.max,o.min,o.fam,o.weight);g.font=r.font;
+  const asc=g.measureText('Hd').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
+  let base=boxTop+boxH/2+(asc-desc)/2;
+  if(dir<0){base+=Math.max(0,edgeY-(base+desc))/2}else{base-=Math.max(0,(base-asc)-edgeY)/2}
+  g.textBaseline='alphabetic';g.fillStyle=o.color;
+  if(o.bold){g.lineWidth=o.bold;g.strokeStyle=o.color;g.lineJoin='round';g.strokeText(r.t,cx,base)}
+  g.fillText(r.t,cx,base);
+}
 async function drawWish(t,list,user){
   const c=document.createElement('canvas');c.width=t.W;c.height=t.H;
   const g=c.getContext('2d');
-  const [bg,deco]=await Promise.all([loadAny(t.bg),loadAny(t.deco).catch(()=>null)]);
+  const [bg,deco]=await Promise.all([loadAny(t.bg),WL.useDeco?loadAny(t.deco).catch(()=>null):null]);
   const imgs=await Promise.all(list.map(i=>loadImg('th/'+i.id+'.jpg').catch(()=>null)));
   g.drawImage(bg,0,0,t.W,t.H);                                          /* layer 1: base */
   const lay=wishLayout(t,list.length);
@@ -658,12 +679,13 @@ async function drawWish(t,list,user){
     g.restore();
   });
   if(deco)lay.forEach(({s,dx})=>{const r=t.star;g.drawImage(deco,s.x+r.dx,s.y+r.dy,r.w,r.h,s.x+r.dx+dx,s.y+r.dy,r.w,r.h)});   /* layer 3: decoration (only for used slots) */
-  g.fillStyle=WL.color;g.textAlign='center';g.textBaseline='middle';   /* layer 4: text */
+  g.textAlign='center';   /* layer 4: text */
   lay.forEach(({s,dx,i})=>{
     const it=list[i],cx=s.x+dx+s.w/2;
-    drawFit(g,memTxt(it)||'—',cx,s.y+t.name.dy+t.name.h/2,s.w-12,34,16,700);
-    drawFit(g,[it.round,it.shop].filter(Boolean).join(' ')||'—',cx,s.y+t.round.dy+t.round.h/2,s.w-12,30,14,500);
+    drawLabel(g,memTxt(it)||'—',cx,s.y+t.name.dy,t.name.h,s.y,-1,{w:s.w-12,max:46,min:22,fam:WL.fonts.name,weight:400,color:WL.colors.name});
+    drawLabel(g,[it.shop,it.round].filter(Boolean).join(' ')||'—',cx,s.y+t.round.dy,t.round.h,s.y+s.h,1,{w:s.w-12,max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.shop,bold:2.5});
   });
+  g.fillStyle=WL.color;g.textBaseline='middle';
   if(user)drawFit(g,'@'+user,WL.user.x+WL.user.w/2,WL.user.y+WL.user.h/2,WL.user.w-40,56,24,700);
   return c;
 }
@@ -680,7 +702,7 @@ async function buildWish(){
   if(!list.length){box.innerHTML='';return}
   box.innerHTML='<p class="cnt">Creating your image…</p>';
   try{
-    await Promise.all([document.fonts.load('700 30px Lexend'),document.fonts.load('500 30px Lexend')]).catch(()=>{});
+    await Promise.all([document.fonts.load('700 30px Lexend'),document.fonts.load('400 30px Yellowtail'),document.fonts.load('400 30px "Bebas Neue"')]).catch(()=>{});
     const sizes=splitEven(list.length,wlMax),user=$('wluser').value.trim().replace(/^@+/,'');
     const urls=[],html=[];let at=0;
     for(let p=0;p<sizes.length;p++){
