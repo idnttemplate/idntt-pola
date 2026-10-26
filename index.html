@@ -606,7 +606,7 @@ document.addEventListener('click',async e=>{
 const WL={
   color:'#2b3a55',font:'Lexend',          /* username */
   useDeco:false,                          /* layer 3 is switched off for now: set to true to bring it back */
-  fonts:{name:"'Yellowtail', cursive",shop:"'Bebas Neue', Impact, sans-serif"},   /* name = script like "my", shop = condensed like WISHLIST */
+  fonts:{name:"'Yellowtail', cursive",shop:"'Bebas Neue', Impact, sans-serif"},   /* member name + username: Yellowtail (free script, similar to Handelson Three); shop: Bebas Neue (free condensed sans, similar to Rahong Medium). Both come from Google Fonts */
   colors:{name:'#ff6f91',shop:'#409cb8'},   /* pink of the PRIORITY star, blue of the OTW star */
   user:{x:372,y:1882,w:1263,h:88},      /* purple bar of layer 4: "@username" */
   templates:[                           /* sorted by max; a template is chosen by number of pola on that image */
@@ -653,13 +653,18 @@ function fitText(g,text,w,max,min,fam,weight){
   if(g.measureText(t).width>w){while(t.length>1&&g.measureText(t+'…').width>w)t=t.slice(0,-1);t+='…'}
   return {t,font:f(s)};
 }
-/* label above (dir -1) or below (dir +1) a slot. The text starts centred in its box, then moves
-   half of its gap towards the pola, so it sits closer to the picture. */
-function drawLabel(g,text,cx,boxTop,boxH,edgeY,dir,o){
+/* spacing: the shop label sits at half of its old (centred) gap under the pola; the member name is
+   placed the same distance above the pola, so both gaps are equal */
+function labelGap(g,t,o){
+  g.font=`${o.weight} ${o.max}px ${o.fam}`;
+  const asc=g.measureText('H').actualBoundingBoxAscent;
+  return Math.max(4,((t.round.dy+t.round.h/2-t.sh)-asc/2)/2);
+}
+function drawLabel(g,text,cx,slotTop,slotH,dir,gap,o){
   const r=fitText(g,text,o.w,o.max,o.min,o.fam,o.weight);g.font=r.font;
-  const asc=g.measureText('Hd').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
-  let base=boxTop+boxH/2+(asc-desc)/2;
-  if(dir<0){base+=Math.max(0,edgeY-(base+desc))/2}else{base-=Math.max(0,(base-asc)-edgeY)/2}
+  const asc=g.measureText('H').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
+  /* above the pola: the baseline is `gap` above it; below the pola: the top of the capitals is `gap` under it */
+  const base=dir<0?Math.min(slotTop-gap,slotTop-desc-4):slotTop+slotH+gap+asc;
   g.textBaseline='alphabetic';g.fillStyle=o.color;
   if(o.bold){g.lineWidth=o.bold;g.strokeStyle=o.color;g.lineJoin='round';g.strokeText(r.t,cx,base)}
   g.fillText(r.t,cx,base);
@@ -680,13 +685,19 @@ async function drawWish(t,list,user){
   });
   if(deco)lay.forEach(({s,dx})=>{const r=t.star;g.drawImage(deco,s.x+r.dx,s.y+r.dy,r.w,r.h,s.x+r.dx+dx,s.y+r.dy,r.w,r.h)});   /* layer 3: decoration (only for used slots) */
   g.textAlign='center';   /* layer 4: text */
+  const oName={max:46,min:22,fam:WL.fonts.name,weight:400,color:WL.colors.name},oShop={max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.shop,bold:1.2};
+  const gap=labelGap(g,t,oShop);
   lay.forEach(({s,dx,i})=>{
     const it=list[i],cx=s.x+dx+s.w/2;
-    drawLabel(g,memTxt(it)||'—',cx,s.y+t.name.dy,t.name.h,s.y,-1,{w:s.w-12,max:46,min:22,fam:WL.fonts.name,weight:400,color:WL.colors.name});
-    drawLabel(g,[it.shop,it.round].filter(Boolean).join(' ')||'—',cx,s.y+t.round.dy,t.round.h,s.y+s.h,1,{w:s.w-12,max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.shop,bold:2.5});
+    drawLabel(g,memTxt(it)||'—',cx,s.y,s.h,-1,gap,{...oName,w:s.w-12});
+    drawLabel(g,[it.shop,it.round].filter(Boolean).join(' ')||'—',cx,s.y,s.h,1,gap,{...oShop,w:s.w-12});
   });
-  g.fillStyle=WL.color;g.textBaseline='middle';
-  if(user)drawFit(g,'@'+user,WL.user.x+WL.user.w/2,WL.user.y+WL.user.h/2,WL.user.w-40,56,24,700);
+  if(user){                                                              /* "by: @username" in the same script font */
+    const r=fitText(g,'by: @'+user,WL.user.w-40,64,28,WL.fonts.name,400);g.font=r.font;
+    const asc=g.measureText('Hd').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
+    g.textBaseline='alphabetic';g.fillStyle=WL.color;
+    g.fillText(r.t,WL.user.x+WL.user.w/2,WL.user.y+WL.user.h/2+(asc-desc)/2);
+  }
   return c;
 }
 try{wish=JSON.parse(localStorage.getItem('pob-wish')||'[]')}catch(e){wish=[]}
@@ -702,7 +713,7 @@ async function buildWish(){
   if(!list.length){box.innerHTML='';return}
   box.innerHTML='<p class="cnt">Creating your image…</p>';
   try{
-    await Promise.all([document.fonts.load('700 30px Lexend'),document.fonts.load('400 30px Yellowtail'),document.fonts.load('400 30px "Bebas Neue"')]).catch(()=>{});
+    await Promise.allSettled([document.fonts.load('700 30px Lexend'),document.fonts.load('400 30px Yellowtail'),document.fonts.load('400 30px "Bebas Neue"')]);
     const sizes=splitEven(list.length,wlMax),user=$('wluser').value.trim().replace(/^@+/,'');
     const urls=[],html=[];let at=0;
     for(let p=0;p<sizes.length;p++){
