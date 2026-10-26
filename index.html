@@ -171,7 +171,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   </div>
   <div id="bulk" class="adm" hidden>
     <b id="bkn"></b>
-    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option></select>
+    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option><option value="desc">Description</option></select>
     <span id="bkval"></span>
     <button class="pri sm" id="bkapply">Apply to selected</button>
     <button class="sm" id="bkall">Select all shown results</button>
@@ -250,6 +250,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <label>Type</label><select id="ftype"></select>
   <label>Date</label><input type="date" id="fdate" min="2025-08-01">
   <label>Set (admin only, optional: 1, 2, 3…)</label><input type="number" id="fset" min="1" placeholder="e.g. 1">
+  <label>Description (admin only, optional)</label><input id="fdesc" maxlength="120" placeholder="shown after the title, e.g. event or cafe name">
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
     <button id="cancel">Cancel</button><button class="pri" id="save">Save</button>
   </div>
@@ -305,7 +306,7 @@ const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const o={
 const mm=i=>i.mems||[];
 const memTxt=i=>mm(i).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
 const typeShow=i=>i.type&&i.type!=='unsorted'&&!HIDE_TYPES.includes(i.type)?i.type:'';
-const titleOf=i=>[i.shop,i.round,typeShow(i)].filter(Boolean).join(' ');
+const titleOf=i=>[i.shop,i.round,typeShow(i),i.desc].filter(Boolean).join(' ');   /* shop + round + (type) + description */
 /* priority inside one date: album inclusion > pob > luckydraw > cafe > everything else */
 const kindOf=x=>{x=norm(x);if(x==='album'||x==='album inclusion')return 0;const k=['pob','luckydraw','cafe'].indexOf(x);return k<0?9:k+1};
 const rank=i=>Math.min(kindOf(i.round),kindOf(i.type));
@@ -402,7 +403,7 @@ function render(){
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
   const toks=q.split(/\s+/).filter(Boolean);
   const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||selType.has(i.type||'__none'))&&(!unsortedOnly||isUnsorted(i))
-    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,i.type,i.date].filter(Boolean).join(' ')))));
+    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,i.type,i.desc,i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
     const da=a.date||'',db=b.date||'',ka=rank(a),kb=rank(b),sa=a.set||9999,sb=b.set||9999;
@@ -512,12 +513,12 @@ function openDlg(it){
   if(!admin)return;
   editId=it?it.id:null;$('dt').textContent=it?'Edit':'Add images';$('filerow').hidden=!!it;
   $('fshop').value=it?.shop||'';$('fmemw').innerHTML=memGrid(it?mm(it):[]);$('fera').value=it?.era||'';$('fround').value=it?.round||'';$('ftype').value=it?.type||'';
-  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('file').value='';setProg('');
+  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('fdesc').value=it?.desc||'';$('file').value='';setProg('');
   $('dlg').showModal();
 }
 $('save').onclick=async()=>{
   if(!admin)return;
-  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,type:$('ftype').value,date:$('fdate').value,set:parseInt($('fset').value)||null};
+  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,type:$('ftype').value,date:$('fdate').value,set:parseInt($('fset').value)||null,desc:$('fdesc').value.trim()};
   $('save').disabled=true;
   try{
     if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>chk(a.map(i=>i.id===editId?{...i,...meta}:i))})}
@@ -551,7 +552,8 @@ function bkInput(){
     round:`<select id="bkv">${listOpts(ROUNDS,'—')}</select>`,
     type:`<select id="bkv">${typeOpts}</select>`,
     date:'<input id="bkv" type="date" min="2025-08-01">',
-    set:'<input id="bkv" type="number" min="1" placeholder="set no. (blank = clear)" style="width:190px">'
+    set:'<input id="bkv" type="number" min="1" placeholder="set no. (blank = clear)" style="width:190px">',
+    desc:'<input id="bkv" maxlength="120" placeholder="description (blank = clear)" style="width:260px">'
   }[f];
 }
 $('bkfield').onchange=bkInput;bkInput();
