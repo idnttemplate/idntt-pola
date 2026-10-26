@@ -279,9 +279,9 @@ if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.host
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
 const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
-const ROUNDS=['Album Inclusion','Broadcast','Cafe','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
-const TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
-const HIDE_TYPES=['album','pob','showcase','broadcast','luckydraw','cafe'];   /* these types are not repeated in the card title */
+const ROUNDS=['Album Inclusion','Broadcast','Cafe','Concert/Fan-con/Fan-meeting','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
+const TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events','f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
+const HIDE_TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events'];   /* these types are not repeated in the card title */
 const NMEM=24,PAGE=120,MIN={y:2025,m:7};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 /* ===== state ===== */
@@ -292,7 +292,7 @@ try{token=localStorage.getItem('pob-gh')||''}catch(e){}
 calM=new Date(Math.max(calM,new Date(MIN.y,MIN.m,1)));calM.setDate(1);
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 /* search keywords that mean the same thing */
-const ALIAS=[[/\b(fan\s*sign|fansign|fs|offline)\b/g,'f2f'],[/\b(video\s*call|video|fan\s*call|fancall|fc)\b/g,'vce'],[/\bld\b/g,'luckydraw']];
+const ALIAS=[[/\b(fan\s*sign|fansign|fs|offline(?!\s*events))\b/g,'f2f'],[/\b(video\s*call|video|fan\s*call|fancall|fc)\b/g,'vce'],[/\bld\b/g,'luckydraw']];
 const alias=q=>ALIAS.reduce((t,[re,to])=>t.replace(re,to),q);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'No date';
@@ -604,7 +604,7 @@ document.addEventListener('click',async e=>{
 /* ===== wishlist: images are built in the visitor's browser, nothing is stored on a server ===== */
 /*WL-PURE-START*/
 const WL={
-  color:'#2b3a55',font:'Lexend',          /* username */
+  color:'#57bfdf',font:'Lexend',          /* "by: @username": light blue of the FOUND star */
   useDeco:false,                          /* layer 3 is switched off for now: set to true to bring it back */
   fonts:{name:"'Yellowtail', cursive",shop:"'Bebas Neue', Impact, sans-serif"},   /* member name + username: Yellowtail (free script, similar to Handelson Three); shop: Bebas Neue (free condensed sans, similar to Rahong Medium). Both come from Google Fonts */
   colors:{name:'#ff6f91',shop:'#409cb8'},   /* pink of the PRIORITY star, blue of the OTW star */
