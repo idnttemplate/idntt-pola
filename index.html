@@ -83,10 +83,10 @@ dialog input,dialog select,dialog textarea{width:100%}
 #aboutdlg h3,#tpldlg h3,#notesdlg h3,#wlguide h3{font-size:24px}
 #aboutdlg .ab-close,#tpldlg .ab-close,#notesdlg .ab-close{margin-top:auto;align-self:flex-end}
 @media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg,#wlguide{width:92vw}}
-.lnks{display:flex;gap:16px;flex:1;margin:6px 0 18px}
-.lnk{flex:1;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;border:1px solid rgba(255,255,255,.35);font-weight:700;font-size:clamp(18px,3vw,28px);border-radius:16px;text-decoration:none;min-height:120px}
+.lnks{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0 18px}
+.lnk{display:flex;align-items:center;justify-content:center;width:200px;height:100px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.35);font-weight:700;font-size:22px;border-radius:14px;text-decoration:none}
 .lnk:hover{background:#1a1a1a}
-@media (max-width:700px){.lnks{flex-direction:column}}
+@media (max-width:700px){.lnk{width:150px;height:75px;font-size:18px}}
 #notesdlg{background:linear-gradient(135deg,#ffd1f0 0%,#c9d6ff 25%,#c8fff0 50%,#fff7c2 75%,#e5c9ff 100%);color:#111;border:1px solid rgba(255,255,255,.7)}
 #notesdlg .ab-close{background:#fff;color:#111;border:1px solid #111;font-weight:700}
 .holo{background:linear-gradient(135deg,#ffd1f0,#c9d6ff,#c8fff0,#fff7c2,#e5c9ff,#ffd1f0);background-size:220% 220%;animation:holo 6s ease infinite;color:#000;border:1px solid rgba(0,0,0,.25);font-weight:700}
@@ -108,6 +108,31 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 .sortbar #unsorted.on{background:var(--ac2);border-color:var(--ac)}
 @media (max-width:1000px){.sortbar{flex-wrap:wrap}.sortbar>*{flex:1 1 30%}}
 @media (max-width:520px){.sortbar>*{flex:1 1 44%}}
+#totop{position:fixed;left:22px;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:30;width:46px;height:46px;border-radius:50%;padding:0;background:var(--ac);color:#fff;border:0;font-size:22px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+#totop[hidden]{display:none}
+#evdlg{width:min(780px,94vw);height:82vh;padding:16px;border-radius:20px}
+#evdlg[open]{display:flex;flex-direction:column}
+.evhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+#evdelbar{display:flex;align-items:center;gap:10px;background:#ffd84d;color:#111;border-radius:12px;padding:8px 12px;margin-bottom:8px;font-size:14px}
+#evdelbar[hidden]{display:none}
+#evdelbar button{background:#111;color:#fff;border:0;border-radius:8px;padding:5px 12px;font-weight:700}
+#evlist{flex:1;overflow:auto;padding:16px 8px;display:flex;flex-direction:column;gap:14px}
+.ev{display:block}
+.evpick{appearance:none;-webkit-appearance:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);width:24px;height:24px;padding:0;margin:0;border:2px solid #e0a800;border-radius:5px;background:#ffd84d;cursor:pointer}
+.evpick:checked{background:#e0a800;box-shadow:inset 0 0 0 5px #ffd84d}
+.evcard{display:grid;grid-template-columns:1fr;gap:4px;border:3px solid var(--cb);border-radius:14px;padding:4px;background:var(--card);transition:transform .2s}
+.evcard>div{padding:10px 14px;border-radius:8px;display:flex;align-items:center;font-size:14px;font-weight:700;word-break:break-word}
+.evt{background:#1d3fa8;color:#fff}
+.evd{position:relative;background:#cfe6ff;color:#0b2a52;justify-content:center;text-align:center}
+.evl{background:#d63b3b;color:#fff}
+.ev.fut .evcard,.ev.past .evcard{filter:brightness(.78)}
+.ev.hi .evcard{transform:scale(1.04);box-shadow:0 0 22px 3px var(--act)}
+@media (max-width:600px){.evcard{grid-template-columns:1fr}}
+.ei1{background:#1d3fa8;color:#fff;border-color:#1d3fa8}
+.ei1::placeholder{color:rgba(255,255,255,.7)}
+.ei2{background:#cfe6ff;color:#0b2a52;border-color:#cfe6ff}
+.ei3 .mg{background:#d63b3b;border-color:#d63b3b}
+.ei3 .mg label{color:#fff}
 #wlguide p{margin:8px 0}
 .card .wl{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:16px;line-height:1;z-index:2;cursor:pointer}
 .card .wl.on{background:var(--ac);color:#fff;border-color:var(--ac)}
@@ -144,12 +169,13 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 </style></head><body>
 
 <header>
-  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small></h1></div>
+  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small><small>made by @idnttemplate</small></h1></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
     <button id="wlbtn" class="sm pri">Wishlist</button>
     <button id="about" class="sm pri">About</button>
     <button id="notes" class="sm holo">Notes</button>
-    <button id="tpl" class="sm pri">Template</button>
+    <button id="tpl" class="sm pri">More</button>
+    <button id="evbtn" class="sm pri">Events</button>
     <button id="theme" class="sm pri" title="Switch theme">Theme: 🌙 Dark</button>
     <button id="sign" class="sm pri">Sign in</button>
   </div>
@@ -192,6 +218,23 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="sgcancel">Cancel</button><button class="go" id="sgok">Sign in</button></div>
 </dialog>
 
+<button id="totop" hidden title="Back to top">↑</button>
+
+<dialog id="evdlg">
+  <div class="evhead"><div><h3 style="margin:0">Events</h3><div class="cnt" id="evkst"></div></div>
+    <div style="display:flex;gap:8px"><button class="pri sm adm" id="evaddbtn">＋ Add event</button><button class="sm" id="evclose">✕</button></div></div>
+  <div id="evdelbar" hidden><b>delete event(s)?</b><span id="evdn"></span><button id="evdel">Delete</button><button id="evdelcancel">Cancel</button></div>
+  <div id="evlist"></div>
+</dialog>
+
+<dialog id="evadd">
+  <h3 style="margin:0 0 4px">Add event</h3>
+  <label>shop + round + type</label><input id="evt" class="ei1" maxlength="120" placeholder="e.g. JumpUp 5.0 f2f" autocomplete="off">
+  <label>date of event</label><input id="evdt" type="date" class="ei2">
+  <label>line up</label><div id="evlu" class="ei3"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="evcancel">Cancel</button><button class="pri" id="evsave">Save</button></div>
+</dialog>
+
 <div id="wlbar" hidden><span>♥ <b id="wln">0</b> in wishlist</span><button id="wlopen">Make wishlist</button><button id="wlclr2">Clear</button></div>
 
 <dialog id="wlguide" class="signd">
@@ -204,7 +247,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 
 <dialog id="wlmk">
   <h3 style="margin:0 0 6px">My wishlist</h3>
-  <label>Username</label><input id="wluser" placeholder="username" maxlength="30" autocomplete="off">
+  <label>username</label><input id="wluser" placeholder="username" maxlength="30" autocomplete="off">
   <div id="wlitems" class="wlitems"></div>
   <div style="margin:6px 0"><button class="sm" id="wlclear">Clear all</button></div>
   <div id="wlprev"></div>
@@ -213,7 +256,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 </dialog>
 
 <dialog id="tpldlg" class="signd">
-  <h3 style="margin:0 0 14px">Template</h3>
+  <h3 style="margin:0 0 14px">More</h3>
   <div class="lnks">
     <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
     <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
@@ -222,7 +265,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 </dialog>
 
 <dialog id="notesdlg">
-  <h3 style="margin:0 0 14px">notes</h3>
+  <h3 style="margin:0 0 14px">acronyms explain</h3>
   <p style="margin:8px 0">acronyms explain:</p>
   <p style="margin:8px 0">f2f: Offline Fansign</p>
   <p style="margin:8px 0">group vce: Online Group Video Call</p>
@@ -288,12 +331,14 @@ const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 /* ===== state ===== */
 const GH=`https://api.github.com/repos/${CFG.owner}/${CFG.repo}`;
 const RAW=`https://raw.githubusercontent.com/${CFG.owner}/${CFG.repo}/${CFG.branch}/`;
-let items=[],wish=[],lastList=[],picked=new Set(),admin=false,unsortedOnly=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
+let items=[],events=[],evPicked=new Set(),wish=[],lastList=[],picked=new Set(),admin=false,unsortedOnly=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
 try{token=localStorage.getItem('pob-gh')||''}catch(e){}
 calM=new Date(Math.max(calM,new Date(MIN.y,MIN.m,1)));calM.setDate(1);
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 /* search keywords that mean the same thing */
-const ALIAS=[[/\b(fan\s*sign|fansign|fs|offline(?!\s*events))\b/g,'f2f'],[/\b(video\s*call|video|fan\s*call|fancall|fc)\b/g,'vce'],[/\bld\b/g,'luckydraw']];
+const ALIAS=[[/\b(fan\s*sign|fansign|fs|offline(?!\s*events))\b/g,'f2f'],[/\b(video\s*call|video|fan\s*call|fancall|fc)\b/g,'vce'],[/\bld\b/g,'luckydraw'],[/\bpre[\s-]?order\b/g,'pob']];
+/* abbreviations typed as a whole word */
+const TOKMAP={jp:'jumpup',am:'apple music',cs:'counting stars',el:'everline',hl:'hellolive',kp2g:'kpoptogether',kptg:'kpoptogether',sw:'soundwave',rs:'rising star',wf:'whosfan',wsf:'whosfan',msg:'mystargoods','20':'[20]',pc:'postcard',bc:'broadcast',gongbang:'broadcast',sc:'showcase'};
 const alias=q=>ALIAS.reduce((t,[re,to])=>t.replace(re,to),q);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'No date';
@@ -306,7 +351,8 @@ const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const o={
 const mm=i=>i.mems||[];
 const memTxt=i=>mm(i).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
 const typeShow=i=>i.type&&i.type!=='unsorted'&&!HIDE_TYPES.includes(i.type)?i.type:'';
-const titleOf=i=>[i.shop,i.round,typeShow(i),i.desc].filter(Boolean).join(' ');   /* shop + round + (type) + description */
+const hideRound=r=>r==='etc.'||/^concert/i.test(r||'');   /* these rounds are not written in the title */
+const titleOf=i=>(hideRound(i.round)?[i.shop,i.desc]:[i.shop,i.round,typeShow(i),i.desc]).filter(Boolean).join(' ');   /* shop + round + (type) + description */
 /* priority inside one date: album inclusion > pob > luckydraw > cafe > everything else */
 const kindOf=x=>{x=norm(x);if(x==='album'||x==='album inclusion')return 0;const k=['pob','luckydraw','cafe'].indexOf(x);return k<0?9:k+1};
 const rank=i=>Math.min(kindOf(i.round),kindOf(i.type));
@@ -379,7 +425,7 @@ function okTok(i,t,h){
     const d=t.replace(/[.\/-]/g,'');
     if(d.length>=4&&d.length<=8&&dateForms(i.date).some(f=>f.startsWith(d)))return true;
   }
-  return h.includes(t);
+  return h.includes(t)||(/^[a-z]{3,}$/.test(t)&&h.replace(/[^a-z0-9]/g,'').includes(t));   /* also finds "K-pop Together" when typing kpoptogether */
 }
 /* a set number may not give the same member twice within one shop + round */
 function setConflict(arr){
@@ -401,7 +447,7 @@ function render(){
   const shops=[...new Set([...SHOPS,...items.map(i=>i.shop)].filter(Boolean))].sort((a,b)=>norm(a)<norm(b)?-1:1);
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
-  const toks=q.split(/\s+/).filter(Boolean);
+  const toks=q.split(/\s+/).filter(Boolean).flatMap(t=>(TOKMAP[t]||t).split(' '));
   const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||selType.has(i.type||'__none'))&&(!unsortedOnly||isUnsorted(i))
     &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,i.type,i.desc,i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
@@ -485,10 +531,11 @@ async function rawItems(){
 const toB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 const setProg=t=>$('prog').textContent=t;
 /* one atomic commit: upload files (add), remove files (del), rewrite data/items.json (mutate) */
-async function commit(msg,{add=[],del=[],mutate}){
+async function commit(msg,{add=[],del=[],mutate,ev}){
   const head=(await gh('/git/ref/heads/'+CFG.branch)).object.sha;
   const base=(await gh('/git/commits/'+head)).tree.sha;
-  const next=mutate(await rawItems());
+  const next=mutate?mutate(await rawItems()):null;
+  const evNext=ev?ev(await rawEvents()):null;
   const tree=[];let n=0;
   for(let k=0;k<add.length;k+=4){
     await Promise.all(add.slice(k,k+4).map(async a=>{
@@ -497,11 +544,12 @@ async function commit(msg,{add=[],del=[],mutate}){
     }));
   }
   del.forEach(p=>tree.push({path:p,mode:'100644',type:'blob',sha:null}));
-  tree.push({path:'data/items.json',mode:'100644',type:'blob',content:JSON.stringify(next)});
+  if(next)tree.push({path:'data/items.json',mode:'100644',type:'blob',content:JSON.stringify(next)});
+  if(evNext)tree.push({path:'data/events.json',mode:'100644',type:'blob',content:JSON.stringify(evNext)});
   const t=await gh('/git/trees',{base_tree:base,tree});
   const c=await gh('/git/commits',{message:msg,tree:t.sha,parents:[head]});
   await gh('/git/refs/heads/'+CFG.branch,{sha:c.sha},'PATCH');
-  items=next;
+  if(next)items=next;if(evNext)events=evNext;
 }
 async function shrink(f,max,q){
   const bm=await createImageBitmap(f),s=Math.min(1,max/Math.max(bm.width,bm.height)),c=document.createElement('canvas');
@@ -603,6 +651,48 @@ document.addEventListener('click',async e=>{
   }
 });
 
+/* ===== events (Korean time, KST) ===== */
+const kstToday=()=>new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Seoul'});
+const evMems=a=>(a||[]).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
+const fixEv=e=>({id:String(e.id||uid()),title:String(e.title||''),date:String(e.date||''),mems:[...new Set((e.mems||[]).map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b)});
+/* newest at the top: upcoming events above, today's event (or the nearest upcoming one) glows in the middle, past events below */
+function renderEv(){
+  const today=kstToday();
+  const list=[...events].sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:(a.title<b.title?-1:1));
+  const future=list.filter(e=>e.date>today).map(e=>e.date);
+  const hi=list.some(e=>e.date===today)?today:(future.length?future[future.length-1]:'');
+  $('evkst').textContent='today (KST): '+today;
+  $('evlist').innerHTML=list.map(e=>`<div class="ev ${e.date===hi?'hi':e.date>today?'fut':'past'}"><div class="evcard"><div class="evt">${esc(e.title)}</div><div class="evd">${fmt(e.date)}${admin?`<input type="checkbox" class="evpick" data-ep="${e.id}" ${evPicked.has(e.id)?'checked':''} title="Select">`:''}</div><div class="evl">${esc(evMems(e.mems))||'—'}</div></div></div>`).join('')||'<p class="cnt">no events yet.</p>';
+  updEvDel();
+}
+function centerEv(){const h=$('evlist').querySelector('.hi');if(h)h.scrollIntoView({block:'center'});else $('evlist').scrollTop=0}
+function updEvDel(){$('evdelbar').hidden=!(admin&&evPicked.size);$('evdn').textContent=evPicked.size+' selected'}
+$('evbtn').onclick=()=>{evPicked.clear();renderEv();$('evdlg').showModal();setTimeout(centerEv,30)};
+$('evclose').onclick=()=>$('evdlg').close();
+$('evlist').addEventListener('change',e=>{const c=e.target.closest('.evpick');if(!c)return;c.checked?evPicked.add(c.dataset.ep):evPicked.delete(c.dataset.ep);updEvDel()});
+$('evdelcancel').onclick=()=>{evPicked.clear();renderEv()};
+$('evdel').onclick=async()=>{
+  if(!admin||!evPicked.size)return;
+  const ids=new Set(evPicked);$('evdel').disabled=true;
+  try{await commit('Delete events',{ev:a=>a.filter(e=>!ids.has(e.id))});evPicked.clear();renderEv();alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('evdel').disabled=false}
+};
+$('evaddbtn').onclick=()=>{if(!admin)return;$('evt').value='';$('evdt').value=kstToday();$('evlu').innerHTML=memGrid([]);$('evadd').showModal()};
+$('evcancel').onclick=()=>$('evadd').close();
+$('evsave').onclick=async()=>{
+  if(!admin)return;
+  const title=$('evt').value.trim(),date=$('evdt').value,mems=gridVals($('evlu'));
+  if(!title||!date){alert('Please fill in the title and the date');return}
+  $('evsave').disabled=true;
+  try{await commit('Add event',{ev:a=>[...a,fixEv({id:uid(),title,date,mems})]});$('evadd').close();renderEv();setTimeout(centerEv,30);alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('evsave').disabled=false}
+};
+/* back to top */
+window.addEventListener('scroll',()=>{$('totop').hidden=window.scrollY<300},{passive:true});
+$('totop').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
 /* ===== wishlist: images are built in the visitor's browser, nothing is stored on a server ===== */
 /*WL-PURE-START*/
 const WL={
@@ -687,18 +777,21 @@ async function drawWish(t,list,user){
   });
   if(deco)lay.forEach(({s,dx})=>{const r=t.star;g.drawImage(deco,s.x+r.dx,s.y+r.dy,r.w,r.h,s.x+r.dx+dx,s.y+r.dy,r.w,r.h)});   /* layer 3: decoration (only for used slots) */
   g.textAlign='center';   /* layer 4: text */
-  const oName={max:46,min:22,fam:WL.fonts.name,weight:400,color:WL.colors.name},oShop={max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.shop,bold:1.2};
+  const oName={max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.name,bold:1.2},   /* member name now uses the same font as the shop name */
+        oShop={max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.shop,bold:1.2};
   const gap=labelGap(g,t,oShop);
   lay.forEach(({s,dx,i})=>{
     const it=list[i],cx=s.x+dx+s.w/2;
     drawLabel(g,memTxt(it)||'—',cx,s.y,s.h,-1,gap,{...oName,w:s.w-12});
-    drawLabel(g,[it.shop,it.round].filter(Boolean).join(' ')||'—',cx,s.y,s.h,1,gap,{...oShop,w:s.w-12});
+    drawLabel(g,[it.shop,hideRound(it.round)?'':it.round].filter(Boolean).join(' ')||'—',cx,s.y,s.h,1,gap,{...oShop,w:s.w-12});
   });
   if(user){                                                              /* "by: @username" in the same script font */
     const r=fitText(g,'by: @'+user,WL.user.w-40,64,28,WL.fonts.name,400);g.font=r.font;
     const asc=g.measureText('Hd').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
     g.textBaseline='alphabetic';g.fillStyle=WL.color;
+    g.shadowColor='rgba(24,84,112,.5)';g.shadowBlur=7;g.shadowOffsetX=3;g.shadowOffsetY=4;   /* soft shadow so the username stands out */
     g.fillText(r.t,WL.user.x+WL.user.w/2,WL.user.y+WL.user.h/2+(asc-desc)/2);
+    g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetX=0;g.shadowOffsetY=0;
   }
   return c;
 }
@@ -707,7 +800,7 @@ const saveWish=()=>{try{localStorage.setItem('pob-wish',JSON.stringify(wish))}ca
 function updWish(){$('wlbar').hidden=!wish.length;$('wln').textContent=wish.length}
 const wlList=()=>wish.map(id=>items.find(i=>i.id===id)).filter(Boolean);
 function renderWL(){
-  $('wlitems').innerHTML=wlList().map((i,k)=>`<span class="wlchip">${k+1}. ${esc(memTxt(i)||'—')} · ${esc(titleOf(i)||'—')} <button data-wr="${i.id}" title="Remove">✕</button></span>`).join('')||'<span class="cnt">Your wishlist is empty. Tap ♡ on a pola to add it.</span>';
+  $('wlitems').innerHTML=wlList().map((i,k)=>`<span class="wlchip">${k+1}. ${esc(memTxt(i)||'—')} · ${esc(titleOf(i)||'—')} <button data-wr="${i.id}" title="Remove">✕</button></span>`).join('')||'<span class="cnt">your wishlist is empty. tap ♡ on a pola to add it.</span>';
 }
 let wlSeq=0,wlUrls=[];
 async function buildWish(){
@@ -775,13 +868,24 @@ $('tplclose').onclick=()=>$('tpldlg').close();
 $('notes').onclick=()=>$('notesdlg').showModal();
 $('notesclose').onclick=()=>$('notesdlg').close();
 
+async function rawEvents(){
+  const r=await fetch(`${GH}/contents/data/events.json?ref=${CFG.branch}`,{headers:hdr({Accept:'application/vnd.github.raw+json'}),cache:'no-store'});
+  if(r.status===404)return [];
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return JSON.parse(await r.text()||'[]').map(fixEv);
+}
 async function load(){
   try{
     if(admin)items=await rawItems();
     else{const r=await fetch('data/items.json?'+Date.now(),{cache:'no-store'});items=r.ok?(await r.json()).map(fixI):[]}
     $('empty').textContent='No pola yet.';
   }catch(e){items=[];$('empty').textContent='Could not load data.'}
+  try{
+    if(admin)events=await rawEvents();
+    else{const r=await fetch('data/events.json?'+Date.now(),{cache:'no-store'});events=r.ok?(await r.json()).map(fixEv):[]}
+  }catch(e){events=[]}
   render();
+  if($('evdlg').open)renderEv();
 }
 load();
 if(token&&CFG.owner)verify(token).then(()=>setAdmin(true)).catch(()=>{});
