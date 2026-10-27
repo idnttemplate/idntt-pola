@@ -113,26 +113,26 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 #evdlg{width:min(780px,94vw);height:82vh;padding:16px;border-radius:20px}
 #evdlg[open]{display:flex;flex-direction:column}
 .evhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
-#evdelbar{display:flex;align-items:center;gap:10px;background:#ffd84d;color:#111;border-radius:12px;padding:8px 12px;margin-bottom:8px;font-size:14px}
+#evdelbar{display:flex;align-items:center;gap:10px;background:var(--ac2);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:8px 12px;margin-bottom:8px;font-size:14px}
 #evdelbar[hidden]{display:none}
-#evdelbar button{background:#111;color:#fff;border:0;border-radius:8px;padding:5px 12px;font-weight:700}
-#evlist{flex:1;overflow:auto;padding:16px 8px;display:flex;flex-direction:column;gap:14px}
+#evdelbar button{background:#003366;color:#fff;border:0;border-radius:4px;padding:7px 14px;font-weight:700}
+#evlist{flex:1;overflow:auto;padding:34px 34px;display:flex;flex-direction:column;gap:26px}   /* wide padding so the glow of the highlighted card is never cut off */
 .ev{display:block}
-.evpick{appearance:none;-webkit-appearance:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);width:24px;height:24px;padding:0;margin:0;border:2px solid #e0a800;border-radius:5px;background:#ffd84d;cursor:pointer}
-.evpick:checked{background:#e0a800;box-shadow:inset 0 0 0 5px #ffd84d}
+.evpick{appearance:none;-webkit-appearance:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);width:24px;height:24px;padding:0;margin:0;border:2px solid #fff;border-radius:3px;background:#003366;cursor:pointer}
+.evpick:checked{background:#fff;box-shadow:inset 0 0 0 5px #003366}
 .evcard{display:grid;grid-template-columns:1fr;gap:4px;border:3px solid var(--cb);border-radius:14px;padding:4px;background:var(--card);transition:transform .2s}
 .evcard>div{padding:10px 14px;border-radius:8px;display:flex;align-items:center;font-size:14px;font-weight:700;word-break:break-word}
-.evt{background:#1d3fa8;color:#fff}
-.evd{position:relative;background:#cfe6ff;color:#0b2a52;justify-content:center;text-align:center}
-.evl{background:#d63b3b;color:#fff}
-.ev.fut .evcard,.ev.past .evcard{filter:brightness(.78)}
-.ev.hi .evcard{transform:scale(1.04);box-shadow:0 0 22px 3px var(--act)}
-@media (max-width:600px){.evcard{grid-template-columns:1fr}}
-.ei1{background:#1d3fa8;color:#fff;border-color:#1d3fa8}
+.evt{background:#011f4b;color:#fff;justify-content:center;text-align:center}
+.evd{position:relative;background:#005b96;color:#fff;justify-content:center;text-align:center}
+.evl{background:#b3cde0;color:#000;justify-content:flex-start;text-align:left}
+.ev.fut .evcard,.ev.past .evcard{filter:brightness(.78);transform:scale(.92)}   /* smaller and a little darker than the highlighted card */
+.ev.hi .evcard{transform:none;box-shadow:0 0 18px 3px var(--act);position:relative;z-index:1}   /* biggest card, full glow inside the padding */
+@media (max-width:600px){#evlist{padding:30px 28px}}
+.ei1{background:#011f4b;color:#fff;border-color:#011f4b}
 .ei1::placeholder{color:rgba(255,255,255,.7)}
-.ei2{background:#cfe6ff;color:#0b2a52;border-color:#cfe6ff}
-.ei3 .mg{background:#d63b3b;border-color:#d63b3b}
-.ei3 .mg label{color:#fff}
+.ei2{background:#005b96;color:#fff;border-color:#005b96;color-scheme:dark}
+.ei3 .mg{background:#b3cde0;border-color:#b3cde0}
+.ei3 .mg label{color:#000}
 #wlguide p{margin:8px 0}
 .card .wl{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:16px;line-height:1;z-index:2;cursor:pointer}
 .card .wl.on{background:var(--ac);color:#fff;border-color:var(--ac)}
@@ -662,7 +662,7 @@ function renderEv(){
   const future=list.filter(e=>e.date>today).map(e=>e.date);
   const hi=list.some(e=>e.date===today)?today:(future.length?future[future.length-1]:'');
   $('evkst').textContent='today (KST): '+today;
-  $('evlist').innerHTML=list.map(e=>`<div class="ev ${e.date===hi?'hi':e.date>today?'fut':'past'}"><div class="evcard"><div class="evt">${esc(e.title)}</div><div class="evd">${fmt(e.date)}${admin?`<input type="checkbox" class="evpick" data-ep="${e.id}" ${evPicked.has(e.id)?'checked':''} title="Select">`:''}</div><div class="evl">${esc(evMems(e.mems))||'—'}</div></div></div>`).join('')||'<p class="cnt">no events yet.</p>';
+  $('evlist').innerHTML=list.map(e=>`<div class="ev ${e.date===hi?'hi':e.date>today?'fut':'past'}"><div class="evcard"><div class="evt">${esc(e.title)}</div><div class="evd">${fmt(e.date)}${admin?`<input type="checkbox" class="evpick" data-ep="${e.id}" ${evPicked.has(e.id)?'checked':''} title="Select">`:''}</div><div class="evl">line-up: ${esc(evMems(e.mems))||'—'}</div></div></div>`).join('')||'<p class="cnt">no events yet.</p>';
   updEvDel();
 }
 function centerEv(){const h=$('evlist').querySelector('.hi');if(h)h.scrollIntoView({block:'center'});else $('evlist').scrollTop=0}
