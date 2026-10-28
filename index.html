@@ -375,7 +375,7 @@ const gridVals=el=>[...el.querySelectorAll('input:checked')].map(c=>+c.value);
 $('fera').innerHTML=listOpts(ERAS,'—');$('fround').innerHTML=listOpts(ROUNDS,'—');$('ftype').innerHTML=typeOpts;
 
 /* multi-select filters */
-const MSS=[],MSF={};
+const MSS=[],MSF={},MSR=[];
 const closeAll=()=>document.querySelectorAll('.msp').forEach(p=>p.hidden=true);
 function makeMS(id,label,init){
   const root=$(id),set=new Set();let opts=[],key='';
@@ -398,6 +398,7 @@ function makeMS(id,label,init){
   p.onchange=e=>{const c=e.target;c.checked?set.add(c.value):set.delete(c.value);upd();go()};
   const clear=()=>{set.clear();l.querySelectorAll('input').forEach(i=>i.checked=false);upd()};
   root.querySelector('.msc').onclick=()=>{clear();go()};
+  MSR.push(()=>{l.querySelectorAll('input').forEach(i=>i.checked=set.has(i.value));upd()});
   MSS.push(clear);MSF[id](init);return set;
 }
 const selShop=makeMS('ms-shop','Shop',SHOPS.map(v=>({v,t:v})));
@@ -473,7 +474,7 @@ function render(){
   $('unsorted').textContent='Unsorted ('+items.filter(isUnsorted).length+')';$('unsorted').classList.toggle('on',unsortedOnly);
   $('calbtn').textContent='📅 '+(range?(range.b&&range.b!==range.a?fmt(range.a<range.b?range.a:range.b)+' → '+fmt(range.a<range.b?range.b:range.a):fmt(range.a))+(ext?' ±2d':''):'Date');
   $('calbtn').classList.toggle('on',!!range);
-  updBulk();updWish();
+  updBulk();updWish();syncUrl();
 }
 const go=()=>{shown=PAGE;render()};
 $('more').onclick=()=>{shown+=PAGE;render()};
@@ -874,6 +875,38 @@ async function rawEvents(){
   if(!r.ok)throw new Error('HTTP '+r.status);
   return JSON.parse(await r.text()||'[]').map(fixEv);
 }
+/* sort / filter state lives in the address, e.g. .../idntt-pola/?type=group-vce&sort=first-member */
+let urlReady=false;
+const slug=v=>norm(String(v)).replace(/[^a-z0-9.]+/g,'-').replace(/^-+|-+$/g,'');
+const SORTU={oldest:'asc','first-member':'first','last-member':'last',newest:'desc'};
+function applyUrl(){
+  const p=new URLSearchParams(location.search);
+  const fill=(key,opts,set)=>(p.get(key)||'').split(',').filter(Boolean).forEach(sg=>{const o=opts.find(x=>slug(x.t)===sg);if(o)set.add(o.v)});
+  fill('shop',[...new Set(items.map(i=>i.shop).filter(Boolean))].map(v=>({v,t:v})),selShop);
+  fill('mem',Array.from({length:NMEM},(_,i)=>({v:String(i+1),t:'id'+(i+1)})),selMem);
+  fill('era',ERAS.map(v=>({v,t:v})),selEra);
+  fill('round',ROUNDS.map(v=>({v,t:v})),selRound);
+  fill('type',[...TYPES.map(v=>({v,t:v})),{v:'__none',t:'unsorted'}],selType);
+  if(SORTU[p.get('sort')])sortD=SORTU[p.get('sort')];
+  $('q').value=p.get('q')||'';
+  const m=/^(\d{4}-\d{2}-\d{2})(?:_(\d{4}-\d{2}-\d{2}))?$/.exec(p.get('date')||'');
+  if(m){range={a:m[1],b:m[2]||null};ext=p.get('ext')==='1'}
+  MSR.forEach(f=>f());
+}
+function syncUrl(){
+  if(!urlReady)return;
+  const p=new URLSearchParams(),j=(set,f)=>[...set].map(f).join(',');
+  if(sortD!=='desc')p.set('sort',{asc:'oldest',first:'first-member',last:'last-member'}[sortD]);
+  if(selShop.size)p.set('shop',j(selShop,slug));
+  if(selMem.size)p.set('mem',j([...selMem].sort((a,b)=>a-b),n=>'id'+n));
+  if(selEra.size)p.set('era',j(selEra,slug));
+  if(selRound.size)p.set('round',j(selRound,slug));
+  if(selType.size)p.set('type',j(selType,v=>v==='__none'?'unsorted':slug(v)));
+  if($('q').value.trim())p.set('q',$('q').value.trim());
+  if(range){p.set('date',range.a+(range.b?'_'+range.b:''));if(ext)p.set('ext','1')}
+  const qs=p.toString().replace(/%2C/gi,',');
+  try{history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash)}catch(e){}
+}
 async function load(){
   try{
     if(admin)items=await rawItems();
@@ -884,6 +917,7 @@ async function load(){
     if(admin)events=await rawEvents();
     else{const r=await fetch('data/events.json?'+Date.now(),{cache:'no-store'});events=r.ok?(await r.json()).map(fixEv):[]}
   }catch(e){events=[]}
+  if(!urlReady){applyUrl();urlReady=true}
   render();
   if($('evdlg').open)renderEv();
 }
