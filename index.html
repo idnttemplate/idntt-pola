@@ -83,7 +83,7 @@ dialog input,dialog select,dialog textarea{width:100%}
 #aboutdlg h3,#tpldlg h3,#notesdlg h3,#wlguide h3{font-size:24px}
 #aboutdlg .ab-close,#tpldlg .ab-close,#notesdlg .ab-close{margin-top:auto;align-self:flex-end}
 @media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg,#wlguide{width:92vw}}
-.lnks{display:flex;flex-wrap:wrap;gap:16px;margin:10px 0 18px}
+.lnks{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0 18px}
 .lnk{display:flex;align-items:center;justify-content:center;width:200px;height:100px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.35);font-weight:700;font-size:22px;border-radius:14px;text-decoration:none}
 .lnk:hover{background:#1a1a1a}
 @media (max-width:700px){.lnk{width:150px;height:75px;font-size:18px}}
@@ -134,6 +134,7 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 .ei3 .mg{background:#b3cde0;border-color:#b3cde0}
 .ei3 .mg label{color:#000}
 #wlguide p{margin:8px 0}
+body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* wishlist is admin-only for now */
 .card .wl{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:16px;line-height:1;z-index:2;cursor:pointer}
 .card .wl.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 #wlbar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;background:var(--ac);color:#fff;border-radius:99px;padding:8px 10px 8px 18px;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:14px;white-space:nowrap}
@@ -171,12 +172,11 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 <header>
   <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small><small>made by @idnttemplate</small></h1></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-    <button id="wlbtn" class="sm pri">Wishlist</button>
-    <button id="about" class="sm pri">About</button>
     <button id="notes" class="sm holo">Notes</button>
-    <button id="tpl" class="sm pri">More</button>
-    <button id="evbtn" class="sm pri">Events</button>
+    <button id="evbtn" class="sm holo">Events</button>
+    <button id="wlbtn" class="sm pri">Wishlist</button>
     <button id="theme" class="sm pri" title="Switch theme">Theme: 🌙 Dark</button>
+    <button id="about" class="sm pri">About</button>
     <button id="sign" class="sm pri">Sign in</button>
   </div>
 </header>
@@ -237,6 +237,12 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 
 <div id="wlbar" hidden><span>♥ <b id="wln">0</b> in wishlist</span><button id="wlopen">Make wishlist</button><button id="wlclr2">Clear</button></div>
 
+<dialog id="soondlg" class="signd">
+  <h3 style="margin:0 0 10px">Wishlist</h3>
+  <p style="margin:8px 0">coming soon</p>
+  <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="go" id="soonclose">Close</button></div>
+</dialog>
+
 <dialog id="wlguide" class="signd">
   <h3 style="margin:0 0 14px">Wishlist guide</h3>
   <p>1. tap the ♡ on every pola you want to add to your wishlist.</p>
@@ -255,18 +261,8 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <div style="display:flex;justify-content:flex-end;margin-top:10px"><button id="wlmkclose">Close</button></div>
 </dialog>
 
-<dialog id="tpldlg" class="signd">
-  <h3 style="margin:0 0 14px">More</h3>
-  <div class="lnks">
-    <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
-    <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
-  </div>
-  <button class="go ab-close" id="tplclose">Close</button>
-</dialog>
-
 <dialog id="notesdlg">
   <h3 style="margin:0 0 14px">acronyms explain</h3>
-  <p style="margin:8px 0">acronyms explain:</p>
   <p style="margin:8px 0">f2f: Offline Fansign</p>
   <p style="margin:8px 0">group vce: Online Group Video Call</p>
   <p style="margin:8px 0">1:1 vce: Online 1:1 Video Call</p>
@@ -279,7 +275,11 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
   <p style="margin:8px 0">this website is currently on demo mode, other information about date/round will be updated later.</p>
   <p style="margin:8px 0">types of events (f2f, vce, etc.) will be updated for some, while the rest won't be updated for now</p>
   <p style="margin:8px 0">physical objekts will not be updated</p>
-  <button class="go ab-close" id="abclose">Close</button>
+  <div class="lnks" style="margin-top:auto">
+    <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
+    <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
+  </div>
+  <button class="go ab-close" id="abclose" style="margin-top:0">Close</button>
 </dialog>
 
 <dialog id="dlg">
@@ -836,7 +836,8 @@ function clearWish(){wish=[];saveWish();render();if($('wlmk').open){renderWL();b
 let wlT;
 $('wluser').oninput=()=>{try{localStorage.setItem('pob-wluser',$('wluser').value)}catch(e){}clearTimeout(wlT);wlT=setTimeout(buildWish,350)};
 $('wlitems').onclick=e=>{const b=e.target.closest('[data-wr]');if(b)toggleWish(b.dataset.wr)};
-$('wlbtn').onclick=()=>$('wlguide').showModal();
+$('wlbtn').onclick=()=>admin?$('wlguide').showModal():$('soondlg').showModal();   /* viewers: coming soon, admin: full feature */
+$('soonclose').onclick=()=>$('soondlg').close();
 $('wlgclose').onclick=()=>$('wlguide').close();
 $('wlmake').onclick=()=>{$('wlguide').close();openWL()};
 $('wlopen').onclick=openWL;
@@ -864,8 +865,6 @@ $('sgok').onclick=async()=>{
 };
 $('about').onclick=()=>$('aboutdlg').showModal();
 $('abclose').onclick=()=>$('aboutdlg').close();
-$('tpl').onclick=()=>$('tpldlg').showModal();
-$('tplclose').onclick=()=>$('tpldlg').close();
 $('notes').onclick=()=>$('notesdlg').showModal();
 $('notesclose').onclick=()=>$('notesdlg').close();
 
