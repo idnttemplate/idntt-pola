@@ -290,7 +290,7 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
   <label>Members (tick one or more)</label><div id="fmemw"></div>
   <label>Era</label><select id="fera"></select>
   <label>Round</label><select id="fround"></select>
-  <label>Type</label><select id="ftype"></select>
+  <label>Types (tick one or more, none = unsorted)</label><div id="ftypew"></div>
   <label>Date</label><input type="date" id="fdate" min="2025-08-01">
   <label>Set (admin only, optional: 1, 2, 3…)</label><input type="number" id="fset" min="1" placeholder="e.g. 1">
   <label>Description (admin only, optional)</label><input id="fdesc" maxlength="120" placeholder="shown after the title, e.g. event or cafe name">
@@ -347,15 +347,15 @@ const addD=(s,n)=>{const x=new Date(s+'T00:00');x.setDate(x.getDate()+n);return 
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const memN=n=>n&&NAMES[n-1]?NAMES[n-1]:'';
 /* items support several members (mems). Old items with a single "mem" are converted automatically. */
-const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const o={...i,mems:[...new Set(m.map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b)};delete o.mem;return o};
+const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const t=Array.isArray(i.types)?i.types:(i.type?[i.type]:[]);const o={...i,mems:[...new Set(m.map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b),types:TYPES.filter(x=>t.includes(x))};delete o.mem;delete o.type;return o};   /* an objekt can have several types; old single "type" is converted */
 const mm=i=>i.mems||[];
 const memTxt=i=>mm(i).map(n=>'id'+n+(memN(n)?' '+memN(n):'')).join(', ');
-const typeShow=i=>i.type&&i.type!=='unsorted'&&!HIDE_TYPES.includes(i.type)?i.type:'';
+const typeShow=i=>(i.types||[]).filter(t=>!HIDE_TYPES.includes(t)).join(' + ');   /* e.g. f2f + group vce */
 const hideRound=r=>r==='etc.'||/^concert/i.test(r||'');   /* these rounds are not written in the title */
 const titleOf=i=>(hideRound(i.round)?[i.shop,i.desc]:[i.shop,i.round,typeShow(i),i.desc]).filter(Boolean).join(' ');   /* shop + round + (type) + description */
 /* priority inside one date: album inclusion > pob > luckydraw > cafe > everything else */
 const kindOf=x=>{x=norm(x);if(x==='album'||x==='album inclusion')return 0;const k=['pob','luckydraw','cafe'].indexOf(x);return k<0?9:k+1};
-const rank=i=>Math.min(kindOf(i.round),kindOf(i.type));
+const rank=i=>Math.min(kindOf(i.round),...(i.types||[]).map(kindOf));
 const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era);   /* shop/member/round/date/era (set and type not counted) */
 
 /* theme */
@@ -369,10 +369,11 @@ $('theme').onclick=()=>{theme=theme==='dark'?'light':'dark';try{localStorage.set
 applyTheme();
 
 const listOpts=(a,f)=>`<option value="">${f}</option>`+a.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
-const typeOpts='<option value="">unsorted</option>'+TYPES.map(e=>`<option value="${e}">${e}</option>`).join('');
+const typeGrid=(sel=[])=>`<div class="mg">${TYPES.map(t=>`<label><input type="checkbox" value="${t}" ${sel.includes(t)?'checked':''}> ${t}</label>`).join('')}</div>`;
+const gridStr=el=>[...el.querySelectorAll('input:checked')].map(c=>c.value);
 const memGrid=(sel=[])=>`<div class="mg">${Array.from({length:NMEM},(_,i)=>`<label><input type="checkbox" value="${i+1}" ${sel.includes(i+1)?'checked':''}> id${i+1}${memN(i+1)?' '+esc(memN(i+1)):''}</label>`).join('')}</div>`;
 const gridVals=el=>[...el.querySelectorAll('input:checked')].map(c=>+c.value);
-$('fera').innerHTML=listOpts(ERAS,'—');$('fround').innerHTML=listOpts(ROUNDS,'—');$('ftype').innerHTML=typeOpts;
+$('fera').innerHTML=listOpts(ERAS,'—');$('fround').innerHTML=listOpts(ROUNDS,'—');
 
 /* multi-select filters */
 const MSS=[],MSF={},MSR=[];
@@ -449,8 +450,8 @@ function render(){
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
   const toks=q.split(/\s+/).filter(Boolean).flatMap(t=>(TOKMAP[t]||t).split(' '));
-  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||selType.has(i.type||'__none'))&&(!unsortedOnly||isUnsorted(i))
-    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,i.type,i.desc,i.date].filter(Boolean).join(' ')))));
+  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!unsortedOnly||isUnsorted(i))
+    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,(i.types||[]).join(' '),i.desc,i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
     const da=a.date||'',db=b.date||'',ka=rank(a),kb=rank(b),sa=a.set||9999,sb=b.set||9999;
@@ -561,13 +562,13 @@ const DONE='Saved! Visitors will see the change in about 1–2 minutes, after Gi
 function openDlg(it){
   if(!admin)return;
   editId=it?it.id:null;$('dt').textContent=it?'Edit':'Add images';$('filerow').hidden=!!it;
-  $('fshop').value=it?.shop||'';$('fmemw').innerHTML=memGrid(it?mm(it):[]);$('fera').value=it?.era||'';$('fround').value=it?.round||'';$('ftype').value=it?.type||'';
+  $('fshop').value=it?.shop||'';$('fmemw').innerHTML=memGrid(it?mm(it):[]);$('fera').value=it?.era||'';$('fround').value=it?.round||'';$('ftypew').innerHTML=typeGrid(it?it.types||[]:[]);
   $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('fdesc').value=it?.desc||'';$('file').value='';setProg('');
   $('dlg').showModal();
 }
 $('save').onclick=async()=>{
   if(!admin)return;
-  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,type:$('ftype').value,date:$('fdate').value,set:parseInt($('fset').value)||null,desc:$('fdesc').value.trim()};
+  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,types:gridStr($('ftypew')),date:$('fdate').value,set:parseInt($('fset').value)||null,desc:$('fdesc').value.trim()};
   $('save').disabled=true;
   try{
     if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>chk(a.map(i=>i.id===editId?{...i,...meta}:i))})}
@@ -599,7 +600,7 @@ function bkInput(){
     mem:memGrid([]),
     era:`<select id="bkv">${listOpts(ERAS,'—')}</select>`,
     round:`<select id="bkv">${listOpts(ROUNDS,'—')}</select>`,
-    type:`<select id="bkv">${typeOpts}</select>`,
+    type:typeGrid([]),
     date:'<input id="bkv" type="date" min="2025-08-01">',
     set:'<input id="bkv" type="number" min="1" placeholder="set no. (blank = clear)" style="width:190px">',
     desc:'<input id="bkv" maxlength="120" placeholder="description (blank = clear)" style="width:260px">'
@@ -611,10 +612,11 @@ $('bkall').onclick=()=>{lastList.forEach(i=>picked.add(i.id));render()};
 $('bkclr').onclick=()=>{picked.clear();render()};
 $('bkapply').onclick=async()=>{
   if(!admin||!picked.size)return;
-  const f=$('bkfield').value,key=f==='mem'?'mems':f;let v;
+  const f=$('bkfield').value,key=f==='mem'?'mems':f==='type'?'types':f;let v;
   if(f==='mem')v=gridVals($('bkval'));
+  else if(f==='type')v=gridStr($('bkval'));
   else{v=$('bkv').value.trim();if(f==='set')v=parseInt(v)||null}
-  const shown_=Array.isArray(v)?v.map(n=>'id'+n).join(', '):v;
+  const shown_=f==='mem'?v.map(n=>'id'+n).join(', '):Array.isArray(v)?v.join(' + '):v;
   if(!confirm(`Set ${f} to "${shown_||'(empty)'}" for ${picked.size} pola?`))return;
   const ids=new Set(picked);
   $('bkapply').disabled=true;
@@ -635,7 +637,7 @@ $('bkdel').onclick=async()=>{
 /* detail view */
 function openView(it){
   $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vmem').textContent=memTxt(it)||'—';
-  $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=(it.type&&it.type!=='unsorted'?it.type:'')||'—';$('vdate').textContent=fmt(it.date);
+  $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=(it.types||[]).join(' + ')||'—';$('vdate').textContent=fmt(it.date);
   $('view').scrollTop=0;$('view').showModal();
 }
 $('vx').onclick=()=>$('view').close();
