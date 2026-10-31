@@ -105,6 +105,7 @@ dialog input,dialog select,dialog textarea{width:100%}
 .mg input{width:auto;padding:0;margin:0}
 #bulk .mg{width:min(520px,90vw);max-height:110px}
 .card .mem{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .era{font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card{position:relative}
 .card .pick{position:absolute;top:6px;left:6px;width:22px;height:22px;padding:0;margin:0;z-index:2;accent-color:var(--ac);cursor:pointer}
 #bulk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ac2);border:1px solid var(--ac);border-radius:12px;padding:10px 12px;margin:8px 0;position:sticky;top:8px;z-index:15}
@@ -332,6 +333,7 @@ if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.host
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
 const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
+const ERA_COLORS={uneverm8t:'#ff6700',yesw8are:'#1ab017',itsnot5ver:'#2076f2'};   /* colour of the era line on every card */
 const ROUNDS=['Album Inclusion','Broadcast','Cafe','Concert/Fan-con/Fan-meeting','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
 const TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events','f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
 const HIDE_TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events'];   /* these types are not repeated in the card title */
@@ -476,7 +478,7 @@ function render(){
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
   $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}<button class="wl${wish.includes(i.id)?' on':''}" data-w="${i.id}" title="Add to wishlist">${wish.includes(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
-   <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
+   <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="era" style="color:${ERA_COLORS[i.era]||'var(--mut)'}">${esc(i.era)||'&nbsp;'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
   $('empty').hidden=list.length>0;$('more').hidden=list.length<=shown;
