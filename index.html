@@ -92,10 +92,10 @@ dialog input,dialog select,dialog textarea{width:100%}
 #aboutdlg h3,#tpldlg h3,#notesdlg h3,#wlguide h3{font-size:24px}
 #aboutdlg .ab-close,#tpldlg .ab-close,#notesdlg .ab-close{margin-top:auto;align-self:flex-end}
 @media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg,#wlguide{width:92vw}}
+.signd .lnk{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);font-weight:700}   /* same look for Sheet, Template and admin sign in */
 .lnks{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0 18px}
-.lnk{display:flex;align-items:center;justify-content:center;width:200px;height:100px;background:#000;color:#fff;border:1px solid rgba(255,255,255,.35);font-weight:700;font-size:22px;border-radius:14px;text-decoration:none}
-.lnk:hover{background:#1a1a1a}
-@media (max-width:700px){.lnk{width:150px;height:75px;font-size:18px}}
+.lnk{display:inline-flex;align-items:center;justify-content:center;width:170px;padding:8px 0;font-size:15px;line-height:1.3;border-radius:12px;text-decoration:none;cursor:pointer}
+@media (max-width:700px){.lnk{width:150px}}
 #notesdlg{background:linear-gradient(135deg,#ffd1f0 0%,#c9d6ff 25%,#c8fff0 50%,#fff7c2 75%,#e5c9ff 100%);color:#111;border:1px solid rgba(255,255,255,.7)}
 #notesdlg .ab-close{background:#fff;color:#111;border:1px solid #111;font-weight:700}
 .holo{background:linear-gradient(135deg,#ffd1f0,#c9d6ff,#c8fff0,#fff7c2,#e5c9ff,#ffd1f0);background-size:220% 220%;animation:holo 6s ease infinite;color:#000;border:1px solid rgba(0,0,0,.25);font-weight:700}
@@ -185,9 +185,8 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
     <button id="notes" class="sm holo">Notes</button>
     <button id="evbtn" class="sm holo">Events</button>
     <button id="wlbtn" class="sm pri">Wishlist</button>
-    <button id="theme" class="sm pri" title="Switch theme">Theme: 🌙 Dark</button>
+    <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
     <button id="about" class="sm pri">About</button>
-    <button id="sign" class="sm pri">Sign in</button>
   </div>
 </header>
 <main>
@@ -272,22 +271,29 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
 </dialog>
 
 <dialog id="notesdlg">
-  <h3 style="margin:0 0 14px">acronyms explain</h3>
-  <p style="margin:8px 0">f2f: Offline Fansign</p>
-  <p style="margin:8px 0">group vce: Online Group Video Call</p>
-  <p style="margin:8px 0">1:1 vce: Online 1:1 Video Call</p>
-  <button class="ab-close" id="notesclose">Close</button>
+  <h3 id="nttitle" style="margin:0 0 14px">acronyms explain</h3>
+  <div id="ntlines"></div>
+  <div id="ntedit" hidden>
+    <label>Title</label><input id="ntedtitle" maxlength="80">
+    <label>Lines (one per line)</label><textarea id="ntedlines" rows="8"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="ntcancel">Cancel</button><button class="pri" id="ntsave">Save</button></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:auto;padding-top:14px">
+    <button class="adm" id="ntedbtn">✎ Edit notes</button>
+    <button class="ab-close" id="notesclose" style="margin:0 0 0 auto">Close</button>
+  </div>
 </dialog>
 
 <dialog id="aboutdlg" class="signd">
   <h3 style="margin:0 0 14px">About</h3>
-  <p style="margin:8px 0">© <a href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a> on X</p>
+  <p style="margin:8px 0">© <a href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a> on X, all polaroid pictures credit to the owners/sellers of the photo on X/xianyu/mercari/etc...</p>
   <p style="margin:8px 0">this website is currently on demo mode, other information about date/round will be updated later.</p>
   <p style="margin:8px 0">types of events (f2f, vce, etc.) will be updated for some, while the rest won't be updated for now</p>
   <p style="margin:8px 0">physical objekts will not be updated</p>
   <div class="lnks" style="margin-top:auto">
     <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
     <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
+    <button class="lnk" id="sign">admin sign in</button>
   </div>
   <button class="go ab-close" id="abclose" style="margin-top:0">Close</button>
 </dialog>
@@ -374,7 +380,7 @@ let theme='dark';
 try{theme=localStorage.getItem('pob-theme')==='light'?'light':'dark'}catch(e){}
 function applyTheme(){
   document.documentElement.setAttribute('data-theme',theme);
-  $('theme').textContent='Theme: '+(theme==='dark'?'🌙 Dark':'☀ Light');
+  $('theme').textContent=theme==='dark'?'🌙 Dark':'☀ Light';
 }
 $('theme').onclick=()=>{theme=theme==='dark'?'light':'dark';try{localStorage.setItem('pob-theme',theme)}catch(e){}applyTheme()};
 applyTheme();
@@ -565,7 +571,7 @@ async function rawItems(){return (await rawGet('items.json')).map(fixI)}
 const toB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 const setProg=t=>$('prog').textContent=t;
 /* one atomic commit: upload files (add), remove files (del), rewrite data/items.json (mutate) */
-async function commit(msg,{add=[],del=[],mutate,ev}){
+async function commit(msg,{add=[],del=[],mutate,ev,nt}){
   const head=(await gh('/git/ref/heads/'+CFG.branch)).object.sha;
   const base=(await gh('/git/commits/'+head)).tree.sha;
   const next=mutate?mutate(await rawItems()):null;
@@ -580,6 +586,7 @@ async function commit(msg,{add=[],del=[],mutate,ev}){
   del.forEach(p=>tree.push({path:p,mode:'100644',type:'blob',sha:null}));
   if(next)tree.push({path:'data/items.json',mode:'100644',type:'blob',content:JSON.stringify(next)});
   if(evNext)tree.push({path:'data/events.json',mode:'100644',type:'blob',content:JSON.stringify(evNext)});
+  if(nt)tree.push({path:'data/notes.json',mode:'100644',type:'blob',content:JSON.stringify(nt)});
   const t=await gh('/git/trees',{base_tree:base,tree});
   const c=await gh('/git/commits',{message:msg,tree:t.sha,parents:[head]});
   await gh('/git/refs/heads/'+CFG.branch,{sha:c.sha},'PATCH');
@@ -884,8 +891,9 @@ async function verify(t){
   if(!r.ok)throw 0;
   const j=await r.json();if(j.permissions&&j.permissions.push===false)throw 0;
 }
-function setAdmin(v){admin=v;if(!v){unsortedOnly=false;picked.clear()}document.body.classList.toggle('admin',v);$('sign').textContent=v?'Sign out':'Sign in';load()}
+function setAdmin(v){admin=v;if(!v){unsortedOnly=false;picked.clear()}document.body.classList.toggle('admin',v);$('sign').textContent=v?'admin sign out':'admin sign in';load()}
 $('sign').onclick=()=>{
+  $('aboutdlg').close();
   if(admin){token='';try{localStorage.removeItem('pob-gh')}catch(e){}setAdmin(false);return}
   $('sgerr').textContent='';$('signdlg').showModal();
 };
@@ -899,10 +907,24 @@ $('sgok').onclick=async()=>{
 };
 $('about').onclick=()=>$('aboutdlg').showModal();
 $('abclose').onclick=()=>$('aboutdlg').close();
-$('notes').onclick=()=>$('notesdlg').showModal();
+$('notes').onclick=()=>{$('ntedit').hidden=true;$('ntlines').hidden=false;$('notesdlg').showModal()};
 $('notesclose').onclick=()=>$('notesdlg').close();
 
 async function rawEvents(){return (await rawGet('events.json')).map(fixEv)}
+/* notes: text in the Notes window, editable by the admin (saved in data/notes.json) */
+const NOTES_DEFAULT={title:'acronyms explain',lines:['f2f: Offline Fansign','group vce: Online Group Video Call','1:1 vce: Online 1:1 Video Call']};
+let notes=NOTES_DEFAULT;
+function renderNotes(){$('nttitle').textContent=notes.title;$('ntlines').innerHTML=notes.lines.map(l=>`<p style="margin:8px 0">${esc(l)}</p>`).join('')}
+$('ntedbtn').onclick=()=>{$('ntedtitle').value=notes.title;$('ntedlines').value=notes.lines.join('\n');$('ntlines').hidden=true;$('ntedit').hidden=false};
+$('ntcancel').onclick=()=>{$('ntedit').hidden=true;$('ntlines').hidden=false};
+$('ntsave').onclick=async()=>{
+  if(!admin)return;
+  const nn={title:$('ntedtitle').value.trim()||'notes',lines:$('ntedlines').value.split('\n').map(x=>x.trim()).filter(Boolean)};
+  $('ntsave').disabled=true;
+  try{await commit('Edit notes',{nt:nn});notes=nn;renderNotes();$('ntedit').hidden=true;$('ntlines').hidden=false;alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('ntsave').disabled=false}
+};
 /* sort / filter state lives in the address, e.g. .../idntt-pola/?type=group-vce&sort=first-member */
 let urlReady=false;
 const slug=v=>norm(String(v)).replace(/[^a-z0-9.]+/g,'-').replace(/^-+|-+$/g,'');
@@ -945,6 +967,13 @@ async function load(){
     if(admin)events=await rawEvents();
     else{const r=await fetch('data/events.json?'+Date.now(),{cache:'no-store'});events=r.ok?(await r.json()).map(fixEv):[]}
   }catch(e){events=[]}
+  try{
+    let n;
+    if(admin)n=await rawGet('notes.json');
+    else{const r=await fetch('data/notes.json?'+Date.now(),{cache:'no-store'});n=r.ok?await r.json():null}
+    notes=n&&Array.isArray(n.lines)&&n.lines.length?{title:n.title||NOTES_DEFAULT.title,lines:n.lines.map(String)}:NOTES_DEFAULT;
+  }catch(e){notes=NOTES_DEFAULT}
+  renderNotes();
   if(!urlReady){applyUrl();urlReady=true}
   render();
   if($('evdlg').open)renderEv();
