@@ -105,6 +105,8 @@ dialog input,dialog select,dialog textarea{width:100%}
 .mg input{width:auto;padding:0;margin:0}
 #bulk .mg{width:min(520px,90vw);max-height:110px}
 .card .mem{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptag{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:7px;background:var(--ac);color:#fff;border:1px solid rgba(255,255,255,.75);font-weight:700;font-size:15px;line-height:22px;text-align:center;z-index:2}   /* small blue tag with a p for preview images */
+body.admin .ptag{left:36px}   /* leave room for the admin select box */
 .card .era{font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card{position:relative}
 .card .pick{position:absolute;top:6px;left:6px;width:22px;height:22px;padding:0;margin:0;z-index:2;accent-color:var(--ac);cursor:pointer}
@@ -200,13 +202,13 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
   </div>
   <div class="sortbar">
     <select id="s-date"><option value="asc">Sort by: A–Z (oldest first)</option><option value="desc">Sort by: Z–A (newest first)</option><option value="first">Sort by: first member (id1 → id24)</option><option value="last">Sort by: last member (id24 → id1)</option></select>
-    <div id="ms-shop"></div><div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div><div id="ms-type"></div>
+    <div id="ms-shop"></div><div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div><div id="ms-type"></div><div id="ms-image"></div>
     <button id="reset">Reset filters</button>
     <button id="unsorted" class="adm">Unsorted</button>
   </div>
   <div id="bulk" class="adm" hidden>
     <b id="bkn"></b>
-    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option><option value="desc">Description</option></select>
+    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option><option value="desc">Description</option><option value="image">Image</option></select>
     <span id="bkval"></span>
     <button class="pri sm" id="bkapply">Apply to selected</button>
     <button class="sm" id="bkall">Select all shown results</button>
@@ -309,6 +311,7 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
   <label>Types (tick one or more, none = unsorted)</label><div id="ftypew"></div>
   <label>Date</label><input type="date" id="fdate" min="2025-08-01">
   <label>Set (admin only, optional: 1, 2, 3…)</label><input type="number" id="fset" min="1" placeholder="e.g. 1">
+  <label>Image (real image / preview)</label><select id="fimage"><option value="">—</option><option value="real image">real image</option><option value="preview">preview</option></select>
   <label>Description (admin only, optional)</label><input id="fdesc" maxlength="120" placeholder="shown after the title, e.g. event or cafe name">
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
     <button id="cancel">Cancel</button><button class="pri" id="save">Save</button>
@@ -373,7 +376,7 @@ const titleOf=i=>(hideRound(i.round)?[i.shop,i.desc]:[i.shop,i.round,typeShow(i)
 /* priority inside one date: album inclusion > pob > luckydraw > cafe > everything else */
 const kindOf=x=>{x=norm(x);if(x==='album'||x==='album inclusion')return 0;const k=['pob','luckydraw','cafe'].indexOf(x);return k<0?9:k+1};
 const rank=i=>Math.min(kindOf(i.round),...(i.types||[]).map(kindOf));
-const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era);   /* shop/member/round/date/era (set and type not counted) */
+const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era&&i.image);   /* shop/member/round/date/era/image (set and type not counted) */
 
 /* theme */
 let theme='dark';
@@ -424,6 +427,7 @@ const selMem=makeMS('ms-mem','Members',Array.from({length:NMEM},(_,i)=>({v:Strin
 const selEra=makeMS('ms-era','Era',ERAS.map(e=>({v:e,t:e})));
 const selRound=makeMS('ms-round','Round',ROUNDS.map(e=>({v:e,t:e})));
 const selType=makeMS('ms-type','Type',[...TYPES.map(e=>({v:e,t:e})),{v:'__none',t:'unsorted'}]);
+const selImage=makeMS('ms-image','Image',[{v:'real image',t:'real image'},{v:'preview',t:'preview'}]);   /* no choice = real image */
 document.addEventListener('click',e=>{if(!e.target.closest('.ms'))closeAll()});
 
 function inRange(d){
@@ -467,8 +471,8 @@ function render(){
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
   const toks=q.split(/\s+/).filter(Boolean).flatMap(t=>(TOKMAP[t]||t).split(' '));
-  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!unsortedOnly||isUnsorted(i))
-    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,(i.types||[]).join(' '),i.desc,i.date].filter(Boolean).join(' ')))));
+  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!selImage.size||selImage.has(i.image||'real image'))&&(!unsortedOnly||isUnsorted(i))
+    &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,(i.types||[]).join(' '),i.desc,i.image||'real image',i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
     const da=a.date||'',db=b.date||'',ka=rank(a),kb=rank(b),sa=a.set||9999,sb=b.set||9999;
@@ -483,7 +487,7 @@ function render(){
   if(items.length)wish=wish.filter(id=>items.some(i=>i.id===id));
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
-  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}<button class="wl${wish.includes(i.id)?' on':''}" data-w="${i.id}" title="Add to wishlist">${wish.includes(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
+  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="wl${wish.includes(i.id)?' on':''}" data-w="${i.id}" title="Add to wishlist">${wish.includes(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
    <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="era" style="color:${ERA_COLORS[i.era]||'var(--mut)'}">${esc(i.era)||'&nbsp;'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
@@ -602,12 +606,12 @@ function openDlg(it){
   if(!admin)return;
   editId=it?it.id:null;$('dt').textContent=it?'Edit':'Add images';$('filerow').hidden=!!it;
   $('fshop').value=it?.shop||'';$('fmemw').innerHTML=memGrid(it?mm(it):[]);$('fera').value=it?.era||'';$('fround').value=it?.round||'';$('ftypew').innerHTML=typeGrid(it?it.types||[]:[]);
-  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('fdesc').value=it?.desc||'';$('file').value='';setProg('');
+  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('fdesc').value=it?.desc||'';$('fimage').value=it?(it.image||''):'real image';$('file').value='';setProg('');
   $('dlg').showModal();
 }
 $('save').onclick=async()=>{
   if(!admin)return;
-  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,types:gridStr($('ftypew')),date:$('fdate').value,set:parseInt($('fset').value)||null,desc:$('fdesc').value.trim()};
+  const meta={shop:$('fshop').value.trim(),mems:gridVals($('fmemw')),era:$('fera').value,round:$('fround').value,types:gridStr($('ftypew')),date:$('fdate').value,set:parseInt($('fset').value)||null,desc:$('fdesc').value.trim(),image:$('fimage').value};
   $('save').disabled=true;
   try{
     if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>chk(a.map(i=>i.id===editId?{...i,...meta}:i))})}
@@ -642,7 +646,8 @@ function bkInput(){
     type:typeGrid([]),
     date:'<input id="bkv" type="date" min="2025-08-01">',
     set:'<input id="bkv" type="number" min="1" placeholder="set no. (blank = clear)" style="width:190px">',
-    desc:'<input id="bkv" maxlength="120" placeholder="description (blank = clear)" style="width:260px">'
+    desc:'<input id="bkv" maxlength="120" placeholder="description (blank = clear)" style="width:260px">',
+    image:'<select id="bkv"><option value="">—</option><option value="real image">real image</option><option value="preview">preview</option></select>'
   }[f];
 }
 $('bkfield').onchange=bkInput;bkInput();
@@ -937,6 +942,7 @@ function applyUrl(){
   fill('era',ERAS.map(v=>({v,t:v})),selEra);
   fill('round',ROUNDS.map(v=>({v,t:v})),selRound);
   fill('type',[...TYPES.map(v=>({v,t:v})),{v:'__none',t:'unsorted'}],selType);
+  fill('image',[{v:'real image',t:'real image'},{v:'preview',t:'preview'}],selImage);
   if(SORTU[p.get('sort')])sortD=SORTU[p.get('sort')];
   $('q').value=p.get('q')||'';
   const m=/^(\d{4}-\d{2}-\d{2})(?:_(\d{4}-\d{2}-\d{2}))?$/.exec(p.get('date')||'');
@@ -952,6 +958,7 @@ function syncUrl(){
   if(selEra.size)p.set('era',j(selEra,slug));
   if(selRound.size)p.set('round',j(selRound,slug));
   if(selType.size)p.set('type',j(selType,v=>v==='__none'?'unsorted':slug(v)));
+  if(selImage.size)p.set('image',j(selImage,slug));
   if($('q').value.trim())p.set('q',$('q').value.trim());
   if(range){p.set('date',range.a+(range.b?'_'+range.b:''));if(ext)p.set('ext','1')}
   const qs=p.toString().replace(/%2C/gi,',');
