@@ -105,7 +105,7 @@ dialog input,dialog select,dialog textarea{width:100%}
 .mg input{width:auto;padding:0;margin:0}
 #bulk .mg{width:min(520px,90vw);max-height:110px}
 .card .mem{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ptag{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:7px;background:var(--ac);color:#fff;border:1px solid rgba(255,255,255,.75);font-weight:700;font-size:15px;line-height:22px;text-align:center;z-index:2}   /* small blue tag with a p for preview images */
+.ptag{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:7px;background:var(--ac);color:#fff;border:1px solid rgba(255,255,255,.75);font-weight:700;font-size:15px;line-height:16px;text-align:center;z-index:2}   /* small blue tag with a p for preview images */
 body.admin .ptag{left:36px}   /* leave room for the admin select box */
 .card .era{font-weight:700;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card{position:relative}
@@ -113,6 +113,8 @@ body.admin .ptag{left:36px}   /* leave room for the admin select box */
 #bulk{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:var(--ac2);border:1px solid var(--ac);border-radius:12px;padding:10px 12px;margin:8px 0;position:sticky;top:8px;z-index:15}
 #bulk[hidden]{display:none}
 #bulk select,#bulk input{height:36px;padding:0 10px;font-size:14px}
+.xl{color:var(--act);text-decoration:underline;text-underline-offset:2px;font-weight:700}
+.signd label{color:rgba(255,255,255,.85)}
 .brand{display:flex;align-items:center;gap:14px;min-width:0}
 .logo{width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none}
 a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-weight:700}
@@ -182,7 +184,7 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
 </style></head><body>
 
 <header>
-  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small><small>made by @idnttemplate</small></h1></div>
+  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small><small>made by <a class="xl" href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a></small></h1></div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
     <button id="notes" class="sm holo">Notes</button>
     <button id="evbtn" class="sm holo">Events</button>
@@ -287,17 +289,19 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
 </dialog>
 
 <dialog id="aboutdlg" class="signd">
-  <h3 style="margin:0 0 14px">About</h3>
-  <p style="margin:8px 0">© <a href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a> on X, all polaroid pictures credit to the owners/sellers of the photo on X/xianyu/mercari/etc...</p>
-  <p style="margin:8px 0">this website is currently on demo mode, other information about date/round will be updated later.</p>
-  <p style="margin:8px 0">types of events (f2f, vce, etc.) will be updated for some, while the rest won't be updated for now</p>
-  <p style="margin:8px 0">physical objekts will not be updated</p>
-  <div class="lnks" style="margin-top:auto">
-    <a class="lnk" href="https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing" target="_blank" rel="noopener">Sheet</a>
-    <a class="lnk" href="https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link" target="_blank" rel="noopener">Template</a>
-    <button class="lnk" id="sign">admin sign in</button>
+  <h3 id="abtitle" style="margin:0 0 14px">About</h3>
+  <div id="ablines"></div>
+  <div id="abedit" hidden>
+    <label>Title</label><input id="abedtitle" maxlength="80">
+    <label>Text (one paragraph per line, link: [text](https://...))</label><textarea id="abedlines" rows="7"></textarea>
+    <label>Buttons (one per line: label | https://link)</label><textarea id="abedlinks" rows="4"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button id="abcancel">Cancel</button><button class="go" id="absave">Save</button></div>
   </div>
-  <button class="go ab-close" id="abclose" style="margin-top:0">Close</button>
+  <div class="lnks" id="ablnks" style="margin-top:auto"><span id="ablinks" style="display:contents"></span><button class="lnk" id="sign">admin sign in</button></div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="adm" id="abedbtn">✎ Edit about</button>
+    <button class="go ab-close" id="abclose" style="margin:0 0 0 auto">Close</button>
+  </div>
 </dialog>
 
 <dialog id="dlg">
@@ -340,9 +344,9 @@ const $=id=>document.getElementById(id);
 const CFG={owner:'',repo:'',branch:'main'};
 if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.hostname.split('.')[0];CFG.repo=location.pathname.split('/')[1]||CFG.owner+'.github.io'}
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
-const NAMES=['dohun','heeju','','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
-const ERAS=['uneverm8t','yesw8are','itsnot5ver'];
-const ERA_COLORS={uneverm8t:'#ff6700',yesw8are:'#1ab017',itsnot5ver:'#2076f2'};   /* colour of the era line on every card */
+const NAMES=['dohun','heeju','sunjae','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
+const ERAS=['uneverm8t','yesw8are','itsnot5ver','find id'];
+const ERA_COLORS={uneverm8t:'#ff6700',yesw8are:'#1ab017',itsnot5ver:'#2076f2','find id':'#B6E9FF'};   /* colour of the era line on every card */
 const ROUNDS=['Album Inclusion','Broadcast','Cafe','Concert/Fan-con/Fan-meeting','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
 const TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events','f2f','group vce','1:1 vce'];   /* items without a type count as "unsorted" */
 const HIDE_TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events'];   /* these types are not repeated in the card title */
@@ -575,7 +579,7 @@ async function rawItems(){return (await rawGet('items.json')).map(fixI)}
 const toB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 const setProg=t=>$('prog').textContent=t;
 /* one atomic commit: upload files (add), remove files (del), rewrite data/items.json (mutate) */
-async function commit(msg,{add=[],del=[],mutate,ev,nt}){
+async function commit(msg,{add=[],del=[],mutate,ev,nt,ab}){
   const head=(await gh('/git/ref/heads/'+CFG.branch)).object.sha;
   const base=(await gh('/git/commits/'+head)).tree.sha;
   const next=mutate?mutate(await rawItems()):null;
@@ -591,6 +595,7 @@ async function commit(msg,{add=[],del=[],mutate,ev,nt}){
   if(next)tree.push({path:'data/items.json',mode:'100644',type:'blob',content:JSON.stringify(next)});
   if(evNext)tree.push({path:'data/events.json',mode:'100644',type:'blob',content:JSON.stringify(evNext)});
   if(nt)tree.push({path:'data/notes.json',mode:'100644',type:'blob',content:JSON.stringify(nt)});
+  if(ab)tree.push({path:'data/about.json',mode:'100644',type:'blob',content:JSON.stringify(ab)});
   const t=await gh('/git/trees',{base_tree:base,tree});
   const c=await gh('/git/commits',{message:msg,tree:t.sha,parents:[head]});
   await gh('/git/refs/heads/'+CFG.branch,{sha:c.sha},'PATCH');
@@ -910,7 +915,7 @@ $('sgok').onclick=async()=>{
     $('signdlg').close();$('sgtk').value='';setAdmin(true);
   }catch(e){$('sgerr').textContent='Incorrect information.'}
 };
-$('about').onclick=()=>$('aboutdlg').showModal();
+$('about').onclick=()=>{$('abedit').hidden=true;$('ablines').hidden=false;$('ablnks').hidden=false;$('aboutdlg').showModal()};
 $('abclose').onclick=()=>$('aboutdlg').close();
 $('notes').onclick=()=>{$('ntedit').hidden=true;$('ntlines').hidden=false;$('notesdlg').showModal()};
 $('notesclose').onclick=()=>$('notesdlg').close();
@@ -929,6 +934,33 @@ $('ntsave').onclick=async()=>{
   try{await commit('Edit notes',{nt:nn});notes=nn;renderNotes();$('ntedit').hidden=true;$('ntlines').hidden=false;alert(DONE)}
   catch(e){alert('Failed: '+e.message)}
   finally{$('ntsave').disabled=false}
+};
+/* about: text and extra buttons in the About window, editable by the admin (saved in data/about.json) */
+const ABOUT_DEFAULT={title:'About',
+  lines:['© [@idnttemplate](https://x.com/idnttemplate) on X, all polaroid pictures credit to the owners/sellers of the photo on X/xianyu/mercari/etc...','this website is currently on demo mode, other information about date/round will be updated later.',"types of events (f2f, vce, etc.) will be updated for some, while the rest won't be updated for now",'physical objekts will not be updated'],
+  links:[{label:'Sheet',url:'https://docs.google.com/spreadsheets/d/1WYYj9NHTxBJhXOZM7wlMGYn_5t9k3Tz4jC6EHm_oqsI/edit?usp=sharing'},{label:'Template',url:'https://drive.google.com/drive/folders/1_eoq0-d3NTaQNQ-lKPNRFw8h4Xe2BQLt?usp=drive_link'}]};
+let about=ABOUT_DEFAULT;
+const okUrl=u=>/^https?:\/\//i.test(u);
+const mdLinks=t=>esc(t).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+function renderAbout(){
+  $('abtitle').textContent=about.title;
+  $('ablines').innerHTML=about.lines.map(l=>`<p style="margin:8px 0">${mdLinks(l)}</p>`).join('');
+  $('ablinks').innerHTML=about.links.filter(l=>okUrl(l.url)).map(l=>`<a class="lnk" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join('');
+}
+const abView=edit=>{$('abedit').hidden=!edit;$('ablines').hidden=edit;$('ablnks').hidden=edit};
+$('abedbtn').onclick=()=>{
+  $('abedtitle').value=about.title;$('abedlines').value=about.lines.join('\n');
+  $('abedlinks').value=about.links.map(l=>l.label+' | '+l.url).join('\n');abView(true);
+};
+$('abcancel').onclick=()=>abView(false);
+$('absave').onclick=async()=>{
+  if(!admin)return;
+  const links=$('abedlinks').value.split('\n').map(x=>x.trim()).filter(Boolean).map(x=>{const k=x.lastIndexOf('|');return k<0?null:{label:x.slice(0,k).trim(),url:x.slice(k+1).trim()}}).filter(l=>l&&l.label&&okUrl(l.url));
+  const nn={title:$('abedtitle').value.trim()||'About',lines:$('abedlines').value.split('\n').map(x=>x.trim()).filter(Boolean),links};
+  $('absave').disabled=true;
+  try{await commit('Edit about',{ab:nn});about=nn;renderAbout();abView(false);alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('absave').disabled=false}
 };
 /* sort / filter state lives in the address, e.g. .../idntt-pola/?type=group-vce&sort=first-member */
 let urlReady=false;
@@ -980,7 +1012,13 @@ async function load(){
     else{const r=await fetch('data/notes.json?'+Date.now(),{cache:'no-store'});n=r.ok?await r.json():null}
     notes=n&&Array.isArray(n.lines)&&n.lines.length?{title:n.title||NOTES_DEFAULT.title,lines:n.lines.map(String)}:NOTES_DEFAULT;
   }catch(e){notes=NOTES_DEFAULT}
-  renderNotes();
+  try{
+    let n;
+    if(admin)n=await rawGet('about.json');
+    else{const r=await fetch('data/about.json?'+Date.now(),{cache:'no-store'});n=r.ok?await r.json():null}
+    about=n&&Array.isArray(n.lines)&&Array.isArray(n.links)?{title:n.title||'About',lines:n.lines.map(String),links:n.links.filter(l=>l&&l.label&&l.url)}:ABOUT_DEFAULT;
+  }catch(e){about=ABOUT_DEFAULT}
+  renderNotes();renderAbout();
   if(!urlReady){applyUrl();urlReady=true}
   render();
   if($('evdlg').open)renderEv();
