@@ -17,11 +17,16 @@ idntt pola tracker is a fanmade site only without any relevance to MODHAUS' COSM
 - Data and media details (such as images and descriptions) are manually updated to ensure accuracy.
 - **No members' images or official media assets were fed into, trained on, or processed by Generative AI models.**
 
-## 3. Contributing:
+## 3. Tech Stack:
+* **Frontend:** HTML5, CSS3, JavaScript (Vanilla JS)
+* **Hosting:** GitHub Pages
+* **Typography & UI:** Custom Web Fonts & SVG Icons
+
+## 4. Contributing:
 - To ensure the security of the website, direct code contributions or repository Pull Requests are not enabled.
 - However, community contributions are always appreciated!
 * If you spot any missing polaroids, datas (such as dates. types of events), or want to submit images, please send a DM via X to **[@idnttemplate](https://x.com/idnttemplate)**.
 * All submitted information will be manually verified and updated be admin!
 
-## 4. Contact:
+## 5. Contact:
 - X (Twitter): [@idnttemplate](https://x.com/idnttemplate)
