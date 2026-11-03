@@ -3,7 +3,7 @@ All idntt pola and physical items archieved in one place!
 idntt pola tracker is a fanmade site only without any relevance to MODHAUS' COSMO app.
 
 ## 1. Features:
-- Archieving and tracking idntt's polaroids from diffent events/websites.
+- Archieving and tracking idntt's polaroids from different events/websites.
 - Sorting polaroids/physical items by members, shops, eras, rounds and types.
 - Making lists for your polaroids.
 
