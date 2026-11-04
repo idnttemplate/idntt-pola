@@ -161,6 +161,14 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
 .wlpg{margin:14px 0;text-align:center}
 .wlpg img{max-width:min(100%,480px);height:auto;border-radius:12px;display:block;margin:0 auto 8px;border:1px solid var(--bd)}
 .lnk2{display:inline-block;background:var(--ac);color:#fff;font-weight:700;padding:8px 16px;border-radius:10px;text-decoration:none}
+body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
+.card .lb{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:18px;line-height:1;z-index:2;cursor:pointer}
+body.user .card .wl{top:38px}
+.lsrow{display:flex;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
+.lsrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lsdlg,#lspick{width:min(520px,94vw);max-height:90vh;overflow:auto}
+#lspicklist label{display:flex;gap:8px;align-items:center;margin:0;padding:6px 0;font-size:14px;color:var(--tx)}
+#lspicklist input{width:auto;padding:0;margin:0}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -188,6 +196,7 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
   <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
     <button id="notes" class="sm holo">Notes</button>
     <button id="evbtn" class="sm holo">Events</button>
+    <button id="lsbtn" class="sm pri">Lists</button>
     <button id="wlbtn" class="sm pri">Wishlist</button>
     <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
     <button id="about" class="sm pri">About</button>
@@ -204,7 +213,7 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
   </div>
   <div class="sortbar">
     <select id="s-date"><option value="asc">Sort by: A–Z (oldest first)</option><option value="desc">Sort by: Z–A (newest first)</option><option value="first">Sort by: first member (id1 → id24)</option><option value="last">Sort by: last member (id24 → id1)</option></select>
-    <div id="ms-shop"></div><div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div><div id="ms-type"></div><div id="ms-image"></div>
+    <div id="ms-shop"></div><div id="ms-mem"></div><div id="ms-era"></div><div id="ms-round"></div><div id="ms-type"></div><div id="ms-image"></div><div class="usr"><div id="ms-list"></div></div>
     <button id="reset">Reset filters</button>
     <button id="unsorted" class="adm">Unsorted</button>
   </div>
@@ -250,8 +259,32 @@ body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* 
 
 <div id="wlbar" hidden><span>♥ <b id="wln">0</b> in wishlist</span><button id="wlopen">Make wishlist</button><button id="wlclr2">Clear</button></div>
 
+<dialog id="lsdlg">
+  <h3 style="margin:0 0 8px">my lists</h3>
+  <div id="lsauth">
+    <label>username</label><input id="lsuser" maxlength="40" autocomplete="username" placeholder="3-20 characters: a-z, 0-9, _">
+    <label>password</label><input id="lspass" type="password" autocomplete="current-password" placeholder="at least 6 characters">
+    <div id="lserr" class="cnt" style="color:var(--danger);min-height:18px"></div>
+    <div style="display:flex;gap:8px;margin-top:6px"><button class="pri" id="lslogin">log in</button><button id="lssignup">create account</button></div>
+    <p class="cnt">no email needed. keep your password safe: it cannot be recovered if you forget it.</p>
+  </div>
+  <div id="lsmain" hidden>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>hi, <b id="lshi"></b></span><button class="sm" id="lslogout">log out</button></div>
+    <div style="display:flex;gap:8px;margin:12px 0"><input id="lsnew" maxlength="40" placeholder="new list name"><button class="pri" id="lsadd" style="white-space:nowrap">add list</button></div>
+    <div id="lslists"></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-top:14px"><button id="lsclose">Close</button></div>
+</dialog>
+
+<dialog id="lspick">
+  <h3 style="margin:0 0 8px">add to list</h3>
+  <div id="lspicklist"></div>
+  <div style="display:flex;gap:8px;margin:12px 0"><input id="lspicknew" maxlength="40" placeholder="new list name"><button class="pri" id="lspickadd" style="white-space:nowrap">new list</button></div>
+  <div style="display:flex;justify-content:flex-end"><button id="lspickclose">Done</button></div>
+</dialog>
+
 <dialog id="soondlg" class="signd">
-  <h3 style="margin:0 0 10px">Wishlist</h3>
+  <h3 id="soontitle" style="margin:0 0 10px">Wishlist</h3>
   <p style="margin:8px 0">coming soon</p>
   <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="go" id="soonclose">Close</button></div>
 </dialog>
@@ -475,7 +508,7 @@ function render(){
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
   const toks=q.split(/\s+/).filter(Boolean).flatMap(t=>(TOKMAP[t]||t).split(' '));
-  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!selImage.size||selImage.has(i.image||'real image'))&&(!unsortedOnly||isUnsorted(i))
+  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!selImage.size||selImage.has(i.image||'real image'))&&(!selList.size||[...selList].some(id=>listSets[id]&&listSets[id].has(i.id)))&&(!unsortedOnly||isUnsorted(i))
     &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,(i.types||[]).join(' '),i.desc,i.image||'real image',i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
@@ -491,7 +524,7 @@ function render(){
   if(items.length)wish=wish.filter(id=>items.some(i=>i.id===id));
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
-  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="wl${wish.includes(i.id)?' on':''}" data-w="${i.id}" title="Add to wishlist">${wish.includes(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
+  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="wl${wish.includes(i.id)?' on':''}" data-w="${i.id}" title="Add to wishlist">${wish.includes(i.id)?'♥':'♡'}</button><button class="lb" data-lb="${i.id}" title="add to a list">＋</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
    <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="era" style="color:${ERA_COLORS[i.era]||'var(--mut)'}">${esc(i.era)||'&nbsp;'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
@@ -692,8 +725,9 @@ function openView(it){
 $('vx').onclick=()=>$('view').close();
 $('view').addEventListener('click',e=>{if(e.target===$('view'))$('view').close()});
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('[data-v],[data-e],[data-x],[data-w]');if(!t)return;
-  if(t.dataset.w)toggleWish(t.dataset.w);
+  const t=e.target.closest('[data-v],[data-e],[data-x],[data-w],[data-lb]');if(!t)return;
+  if(t.dataset.lb)openPick(t.dataset.lb);
+  else if(t.dataset.w)toggleWish(t.dataset.w);
   else if(t.dataset.v)openView(items.find(i=>i.id===t.dataset.v));
   else if(admin&&t.dataset.e)openDlg(items.find(x=>x.id===t.dataset.e));
   else if(admin&&t.dataset.x&&confirm('Delete this image?')){
@@ -887,7 +921,7 @@ function clearWish(){wish=[];saveWish();render();if($('wlmk').open){renderWL();b
 let wlT;
 $('wluser').oninput=()=>{try{localStorage.setItem('pob-wluser',$('wluser').value)}catch(e){}clearTimeout(wlT);wlT=setTimeout(buildWish,350)};
 $('wlitems').onclick=e=>{const b=e.target.closest('[data-wr]');if(b)toggleWish(b.dataset.wr)};
-$('wlbtn').onclick=()=>admin?$('wlguide').showModal():$('soondlg').showModal();   /* viewers: coming soon, admin: full feature */
+$('wlbtn').onclick=()=>{if(admin)$('wlguide').showModal();else{$('soontitle').textContent='Wishlist';$('soondlg').showModal()}};   /* viewers: coming soon, admin: full feature */
 $('soonclose').onclick=()=>$('soondlg').close();
 $('wlgclose').onclick=()=>$('wlguide').close();
 $('wlmake').onclick=()=>{$('wlguide').close();openWL()};
@@ -935,6 +969,147 @@ $('ntsave').onclick=async()=>{
   catch(e){alert('Failed: '+e.message)}
   finally{$('ntsave').disabled=false}
 };
+/* ===== accounts + personal lists (Supabase) =====
+   Fill in SB below to switch this on. url = Project URL, key = anon / publishable key (it is meant to be public;
+   what each person may read or write is limited by the row level security rules in supabase-setup.sql).
+   domain = only used to turn a username into a login address (nobody receives mail there). */
+const SB={url:'https://vxqjubyylfhxcfkrnyed.supabase.co',key:'sb_publishable_pqSZ29At1WV5Tj8xee9ZOw_C714Xw1D',domain:'idnttemplate.github.io'};
+let sess=null,myLists=[],listSets={};
+try{sess=JSON.parse(localStorage.getItem('pob-sb')||'null')}catch(e){}
+const sbOn=()=>!!(SB.url&&SB.key);
+const uEmail=u=>u.includes('@')?u:`${u}@${SB.domain}`;
+const uName=()=>sess&&sess.user&&sess.user.email?sess.user.email.split('@')[0]:'';
+async function sbReq(path,{method='GET',body,auth=true,prefer}={}){
+  if(auth&&sess&&sess.expires_at*1000<Date.now()+30000)await sbRefresh();
+  const h={apikey:SB.key,'Content-Type':'application/json'};
+  if(auth&&sess)h.Authorization='Bearer '+sess.access_token;
+  if(prefer)h.Prefer=prefer;
+  const r=await fetch(SB.url+path,{method,headers:h,body:body?JSON.stringify(body):undefined});
+  const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(e){}
+  if(!r.ok){const er=new Error((j&&(j.msg||j.message||j.error_description||j.error))||('HTTP '+r.status));er.status=r.status;throw er}
+  return j;
+}
+function saveSess(j){
+  if(!j||!j.access_token)return;
+  sess={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user};
+  try{localStorage.setItem('pob-sb',JSON.stringify(sess))}catch(e){}
+}
+async function sbRefresh(){
+  try{saveSess(await sbReq('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:sess.refresh_token},auth:false}))}
+  catch(e){logoutLocal()}
+}
+async function sbAll(path){            /* PostgREST returns at most 1000 rows per request: read page by page */
+  const out=[];
+  for(let a=0;;a+=1000){
+    const rows=await sbReq(path+'&limit=1000&offset='+a);
+    out.push(...rows);if(rows.length<1000)break;
+  }
+  return out;
+}
+const selList=makeMS('ms-list','List',[]);
+async function loadLists(){
+  const ls=await sbAll('/rest/v1/lists?select=id,name&order=created_at.asc');
+  const li=await sbAll('/rest/v1/list_items?select=list_id,item_id&order=created_at.asc,item_id.asc');
+  myLists=ls;listSets={};ls.forEach(l=>listSets[l.id]=new Set());
+  li.forEach(x=>{if(listSets[x.list_id])listSets[x.list_id].add(x.item_id)});
+  MSF['ms-list'](myLists.map(l=>({v:l.id,t:l.name})));
+}
+async function afterLogin(){
+  document.body.classList.add('user');
+  try{await loadLists()}catch(e){if(e.status===401||e.status===403){logoutLocal();return}throw e}
+  renderLs();render();
+}
+function logoutLocal(){
+  sess=null;try{localStorage.removeItem('pob-sb')}catch(e){}
+  document.body.classList.remove('user');myLists=[];listSets={};
+  MSF['ms-list']([]);selList.clear();MSR.forEach(f=>f());renderLs();render();
+}
+const friendly=m=>/invalid login/i.test(m)?'wrong username or password':/already registered|already been registered/i.test(m)?'this username is already taken':/password/i.test(m)&&/6|least|short|weak/i.test(m)?'password must have at least 6 characters':/signups? (are )?(not allowed|disabled)/i.test(m)?'new accounts are switched off':/invalid/i.test(m)&&/email/i.test(m)?'the username was refused (see the guide: change SB.domain)':m;
+async function lsAuth(kind){
+  const u=$('lsuser').value.trim().toLowerCase(),p=$('lspass').value;
+  $('lserr').textContent='';
+  if(!u.includes('@')&&!/^[a-z0-9_]{3,20}$/.test(u)){$('lserr').textContent='username: 3-20 characters, only a-z, 0-9 and _';return}
+  if(p.length<6){$('lserr').textContent='password must have at least 6 characters';return}
+  try{
+    const j=await sbReq(kind==='up'?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body:{email:uEmail(u),password:p},auth:false});
+    if(!j||!j.access_token){$('lserr').textContent='account created. please log in.';return}
+    saveSess(j);$('lspass').value='';await afterLogin();
+  }catch(e){$('lserr').textContent=friendly(e.message)}
+}
+function renderLs(){
+  const on=!!sess;
+  $('lsauth').hidden=on;$('lsmain').hidden=!on;
+  if(!on)return;
+  $('lshi').textContent=uName();
+  const have=new Set(items.map(i=>i.id));
+  $('lslists').innerHTML=myLists.map(l=>`<div class="lsrow"><span class="nm">${esc(l.name)} <span class="cnt">(${[...(listSets[l.id]||[])].filter(id=>have.has(id)).length})</span></span><button class="sm" data-lv="${l.id}">view</button><button class="sm" data-lr="${l.id}" title="rename">✎</button><button class="sm" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div>`).join('')||'<p class="cnt">no lists yet. add your first list above.</p>';
+}
+async function createList(name){
+  name=name.trim().slice(0,40);if(!name)return null;
+  const j=await sbReq('/rest/v1/lists',{method:'POST',body:{name},prefer:'return=representation'});
+  const l=Array.isArray(j)?j[0]:j;
+  myLists.push({id:l.id,name:l.name});listSets[l.id]=new Set();
+  MSF['ms-list'](myLists.map(x=>({v:x.id,t:x.name})));
+  return l;
+}
+function openLs(){
+  if(!sbOn()){$('soontitle').textContent='Lists';$('soondlg').showModal();return}
+  $('lserr').textContent='';renderLs();$('lsdlg').showModal();
+}
+$('lsbtn').onclick=openLs;
+$('lsclose').onclick=()=>$('lsdlg').close();
+$('lslogin').onclick=()=>lsAuth('in');
+$('lssignup').onclick=()=>lsAuth('up');
+$('lspass').addEventListener('keydown',e=>{if(e.key==='Enter')lsAuth('in')});
+$('lslogout').onclick=async()=>{try{await sbReq('/auth/v1/logout',{method:'POST'})}catch(e){}logoutLocal()};
+$('lsadd').onclick=async()=>{
+  try{const l=await createList($('lsnew').value);if(l){$('lsnew').value='';renderLs()}}
+  catch(e){alert('Failed: '+e.message)}
+};
+$('lslists').onclick=async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const d=b.dataset;
+  try{
+    if(d.lv){selList.clear();selList.add(d.lv);MSR.forEach(f=>f());$('lsdlg').close();go();window.scrollTo({top:0,behavior:'smooth'})}
+    else if(d.lr){
+      const l=myLists.find(x=>x.id===d.lr),n=prompt('rename list',l.name);
+      if(n&&n.trim()){await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.lr),{method:'PATCH',body:{name:n.trim().slice(0,40)}});l.name=n.trim().slice(0,40);MSF['ms-list'](myLists.map(x=>({v:x.id,t:x.name})));renderLs()}
+    }
+    else if(d.ld){
+      const l=myLists.find(x=>x.id===d.ld);
+      if(confirm(`Delete the list "${l.name}"? The pola themselves stay on the site.`)){
+        await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.ld),{method:'DELETE'});
+        myLists=myLists.filter(x=>x.id!==d.ld);delete listSets[d.ld];selList.delete(d.ld);
+        MSF['ms-list'](myLists.map(x=>({v:x.id,t:x.name})));renderLs();render();
+      }
+    }
+  }catch(err){alert('Failed: '+err.message)}
+};
+/* "+" on a card: tick the lists this pola belongs to */
+let pickId=null;
+function renderPick(){
+  $('lspicklist').innerHTML=myLists.map(l=>`<label><input type="checkbox" data-pl="${l.id}" ${listSets[l.id]&&listSets[l.id].has(pickId)?'checked':''}> ${esc(l.name)}</label>`).join('')||'<p class="cnt">no lists yet, create one below.</p>';
+}
+function openPick(id){pickId=id;$('lspicknew').value='';renderPick();$('lspick').showModal()}
+$('lspicklist').onchange=async e=>{
+  const c=e.target.closest('[data-pl]');if(!c)return;
+  const lid=c.dataset.pl;
+  try{
+    if(c.checked){await sbReq('/rest/v1/list_items',{method:'POST',body:{list_id:lid,item_id:pickId},prefer:'resolution=ignore-duplicates'});listSets[lid].add(pickId)}
+    else{await sbReq(`/rest/v1/list_items?list_id=eq.${lid}&item_id=eq.${encodeURIComponent(pickId)}`,{method:'DELETE'});listSets[lid].delete(pickId)}
+    renderLs();render();
+  }catch(err){c.checked=!c.checked;alert('Failed: '+err.message)}
+};
+$('lspickadd').onclick=async()=>{
+  try{
+    const l=await createList($('lspicknew').value);if(!l)return;
+    await sbReq('/rest/v1/list_items',{method:'POST',body:{list_id:l.id,item_id:pickId},prefer:'resolution=ignore-duplicates'});
+    listSets[l.id].add(pickId);$('lspicknew').value='';renderPick();renderLs();render();
+  }catch(err){alert('Failed: '+err.message)}
+};
+$('lspickclose').onclick=()=>$('lspick').close();
+if(sbOn()&&sess)afterLogin().catch(()=>{});
+
 /* about: text and extra buttons in the About window, editable by the admin (saved in data/about.json) */
 const ABOUT_DEFAULT={title:'About',
   lines:['© [@idnttemplate](https://x.com/idnttemplate) on X, all polaroid pictures credit to the owners/sellers of the photo on X/xianyu/mercari/etc...','this website is currently on demo mode, other information about date/round will be updated later.',"types of events (f2f, vce, etc.) will be updated for some, while the rest won't be updated for now",'physical objekts will not be updated'],
