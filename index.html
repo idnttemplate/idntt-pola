@@ -150,7 +150,9 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 .card .lb{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:18px;line-height:1;z-index:2;cursor:pointer}
 .lsrow{display:flex;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
-#lsdlg{width:min(520px,94vw);max-height:90vh;overflow:auto}
+#lsdlg{width:min(660px,94vw);max-height:90vh;overflow:auto}
+#lsdlg h3{font-size:20px;margin:0 0 10px}
+#sidlg{width:min(460px,94vw)}
 #qbar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:94vw;background:var(--ac);color:#fff;border-radius:22px;padding:8px 12px 8px 18px;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:14px}
 #qbar[hidden],#qbar button[hidden]{display:none}
 #qbar button{background:#fff;color:var(--ac);border:0;border-radius:99px;padding:6px 14px;font-weight:700;font-size:13px}
@@ -162,18 +164,29 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 .lsname{flex:1;min-width:0;text-align:left;font-weight:700;padding:8px 12px;background:var(--ac2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #qdlg{width:min(660px,94vw);max-height:90vh;overflow:auto}
 #qdlg h3{font-size:20px;margin:0 0 10px}
-#qlists{display:flex;flex-wrap:wrap;gap:14px}
+#qlists,#lslists{display:flex;flex-wrap:wrap;gap:14px}
 .qt{display:flex;flex-direction:column;width:150px;padding:0;border:3px solid var(--cb);border-radius:12px;overflow:hidden;background:var(--card);cursor:pointer;text-align:center}
 .qt:hover,.qt:focus-visible{box-shadow:0 0 0 3px var(--ac)}
 .qt .qimg{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:var(--ac2);color:var(--mut);font-size:13px;padding:6px}
 .qt .qimg img{width:100%;height:100%;object-fit:contain}
+.qt .qc{font-weight:500;opacity:.85}
 .qt .qname{background:var(--ac);color:#fff;font-weight:700;padding:9px 8px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qor{text-align:center;margin:16px 0 12px;font-size:16px}
+.qcol{display:flex;flex-direction:column;align-items:center;width:150px}
+.qcol .qt{width:100%}
+.qfns{display:flex;gap:6px;margin-top:8px}
+.qfn{width:32px;height:32px;padding:0;border:2px solid var(--cb);border-radius:6px;background:var(--card);font-size:14px;line-height:1;cursor:pointer}
+.qfn:hover{box-shadow:0 0 0 2px var(--ac)}
+#viewhead{font-size:clamp(24px,4vw,40px);font-weight:700;margin:16px 0 6px;line-height:1.15;word-break:break-word}
+#viewhead[hidden],#lockview[hidden]{display:none}
+#lockview{text-align:center;padding:50px 10px}
+.lockic{font-size:84px;line-height:1}
+#lockview p{font-size:22px;font-weight:700;margin:18px 0}
 .qnew{display:flex;gap:10px}
 .qinp{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:3px solid var(--cb);border-radius:10px;padding:0 12px;background:var(--card)}
 .qinp span{font-size:20px;font-weight:700;color:var(--tx)}
 .qinp input{flex:1;min-width:0;border:0;background:none;padding:12px 0;outline:0}
-.qnew button{flex:0 0 auto;background:var(--ac);color:#fff;border:0;border-radius:10px;padding:0 24px;font-weight:700;font-size:15px}
+.qnew button,#lsadd{flex:0 0 auto;background:var(--ac);color:#fff;border:0;border-radius:10px;padding:0 24px;font-weight:700;font-size:15px}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -204,6 +217,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
     <button id="lsbtn" class="sm pri">Lists</button>
     <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
     <button id="about" class="sm pri">About</button>
+    <button id="sibtn" class="sm pri">sign in</button>
   </div>
 </header>
 <main>
@@ -231,6 +245,8 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
     <button class="sm" id="bkdel" style="color:#fff;background:var(--danger);border-color:var(--danger)">Delete selected</button>
   </div>
   <div id="viewbar" hidden><span id="viewtxt"></span><button class="sm" id="viewclear">clear</button></div>
+  <div id="viewhead" hidden></div>
+  <div id="lockview" hidden><div class="lockic">🔒</div><p id="lockmsg"></p></div>
   <div class="cnt" id="cnt"></div>
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" hidden>No pola yet.</div>
@@ -265,8 +281,8 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 <div id="qbar" hidden><span>♥ <b id="qn">0</b> in queue</span><button id="qadd">add to a list</button><button id="qremove" hidden>remove from this list</button><button id="qclear">clear</button></div>
 <div id="toast" hidden></div>
 
-<dialog id="lsdlg">
-  <h3 style="margin:0 0 8px">my lists</h3>
+<dialog id="sidlg">
+  <h3 style="margin:0 0 8px">sign in/sign up</h3>
   <div id="lsauth">
     <label>username</label><input id="lsuser" maxlength="40" autocomplete="username" placeholder="3-20 characters: a-z, 0-9, _">
     <label>password</label><input id="lspass" type="password" autocomplete="current-password" placeholder="at least 6 characters">
@@ -276,10 +292,18 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
   </div>
   <div id="lsmain" hidden>
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span>hi, <b id="lshi"></b></span><button class="sm" id="lslogout">log out</button></div>
-    <div style="display:flex;gap:8px;margin:12px 0"><input id="lsnew" maxlength="40" placeholder="new list name"><button class="pri" id="lsadd" style="white-space:nowrap">add list</button></div>
-    <div id="lslists"></div>
   </div>
-  <div style="display:flex;justify-content:flex-end;margin-top:14px"><button id="lsclose">Close</button></div>
+  <div style="display:flex;justify-content:flex-end;margin-top:14px"><button id="siclose">Close</button></div>
+</dialog>
+
+<dialog id="lsdlg">
+  <h3>my lists</h3>
+  <p id="lsinfo" class="cnt"></p>
+  <div id="lslists"></div>
+  <p class="qor">or</p>
+  <h3 style="font-size:18px">make a new list</h3>
+  <div class="qnew"><div class="qinp"><span>＋</span><input id="lsnew" maxlength="40" placeholder="new list name" autocomplete="off"></div><button id="lsadd">create</button></div>
+  <div style="display:flex;justify-content:flex-end;margin-top:16px"><button id="lsclose">Close</button></div>
 </dialog>
 
 <dialog id="qdlg">
@@ -813,7 +837,7 @@ $('ntsave').onclick=async()=>{
    url = Project URL, key = publishable / anon key (meant to be public: what each person can read or write is limited
    by the row level security rules in supabase-setup.sql). domain = only used to turn a username into a login address. */
 const SB={url:'https://vxqjubyylfhxcfkrnyed.supabase.co',key:'sb_publishable_pqSZ29At1WV5Tj8xee9ZOw_C714Xw1D',domain:'idnttemplate.github.io'};
-let sess=null,myLists=[],listSets={},hashDone=false,viewMsgText='';
+let sess=null,myLists=[],listSets={},hashDone=false;
 const routeHash=location.hash;                     /* e.g. #@username/list-name, read once at start */
 try{sess=JSON.parse(localStorage.getItem('pob-sb')||'null')}catch(e){}
 const sbOn=()=>!!(SB.url&&SB.key);
@@ -881,13 +905,24 @@ async function lsAuth(kind){
   }catch(e){$('lserr').textContent=friendly(e.message)}
 }
 const shareLink=l=>location.origin+location.pathname+'#@'+uName()+'/'+slug(l.name);
+/* a list as a tile: a random pola of the list on top, the name on a blue bar (fns = with the 4 small function buttons) */
+function tileHtml(l,fns){
+  const have=new Set(items.map(i=>i.id));
+  const ids=[...(listSets[l.id]||[])].filter(id=>have.has(id));
+  const pick=ids.length?ids[Math.floor(Math.random()*ids.length)]:null;
+  const tile=`<button class="qt" ${fns?'data-lv':'data-ql'}="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${admin?RAW:''}th/${pick}.jpg" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}${fns?` <span class="qc">(${ids.length})</span>`:''}</div></button>`;
+  if(!fns)return tile;
+  const pub=l.is_public!==false;
+  return `<div class="qcol">${tile}<div class="qfns"><button class="qfn" data-lp="${l.id}" title="${pub?'public: anyone with the link can view it. click to make it private':'private: only you can open it. click to make it public'}">${pub?'🌐':'🔒'}</button><button class="qfn" data-lc="${l.id}" title="copy the link of this list">🔗</button><button class="qfn" data-lr="${l.id}" title="rename">✎</button><button class="qfn" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div></div>`;
+}
 function renderLs(){
   const on=!!sess;
   $('lsauth').hidden=on;$('lsmain').hidden=!on;
+  $('sibtn').textContent=on?uName():'sign in';
   if(!on)return;
   $('lshi').textContent=uName();
-  const have=new Set(items.map(i=>i.id));
-  $('lslists').innerHTML=myLists.map(l=>`<div class="lsrow"><button class="lsname" data-lv="${l.id}" title="show only this list">${esc(l.name)} <span class="cnt">(${[...(listSets[l.id]||[])].filter(id=>have.has(id)).length})</span></button><button class="sm" data-lp="${l.id}" title="${l.is_public===false?'private: only you can open it. click to make it public':'public: anyone with the link can view it. click to make it private'}">${l.is_public===false?'🔒':'🌐'}</button><button class="sm" data-lc="${l.id}" title="copy the link of this list">🔗</button><button class="sm" data-lr="${l.id}" title="rename">✎</button><button class="sm" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div>`).join('')||'<p class="cnt">no lists yet. add your first list above.</p>';
+  $('lsinfo').textContent=myLists.length+(myLists.length===1?' available list':' available lists');
+  $('lslists').innerHTML=myLists.map(l=>tileHtml(l,true)).join('')||'<p class="cnt">you have no lists yet, make one below.</p>';
 }
 async function createList(name){
   name=name.trim().slice(0,40);if(!name)return null;
@@ -898,13 +933,20 @@ async function createList(name){
   syncListOpts();
   return l;
 }
+function openSi(){
+  if(!sbOn()){$('soondlg').showModal();return}
+  $('lserr').textContent='';renderLs();$('sidlg').showModal();
+}
 function openLs(){
   if(!sbOn()){$('soondlg').showModal();return}
-  $('lserr').textContent='';renderLs();$('lsdlg').showModal();
+  if(!sess){toast('please sign in first');openSi();return}
+  renderLs();$('lsdlg').showModal();
 }
 let toastT;
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2800)}
 $('lsbtn').onclick=openLs;
+$('sibtn').onclick=openSi;
+$('siclose').onclick=()=>$('sidlg').close();
 $('lsclose').onclick=()=>$('lsdlg').close();
 $('lslogin').onclick=()=>lsAuth('in');
 $('lssignup').onclick=()=>lsAuth('up');
@@ -918,7 +960,7 @@ $('lslists').onclick=async e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
   try{
-    if(d.lv){shared=null;viewMsgText='';selList.clear();selList.add(d.lv);MSR.forEach(f=>f());$('lsdlg').close();go();window.scrollTo({top:0,behavior:'smooth'})}   /* = sort -> list -> this list */
+    if(d.lv){shared=null;selList.clear();selList.add(d.lv);MSR.forEach(f=>f());$('lsdlg').close();go();window.scrollTo({top:0,behavior:'smooth'})}   /* = sort -> list -> this list */
     else if(d.lp){
       const l=myLists.find(x=>x.id===d.lp),v=l.is_public===false;
       await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.lp),{method:'PATCH',body:{is_public:v}});l.is_public=v;renderLs();
@@ -955,12 +997,7 @@ function updQueue(){
 }
 function renderQ(){
   $('qinfo').textContent=queue.size+' pola in queue: tap a list to add them';
-  const have=new Set(items.map(i=>i.id));
-  $('qlists').innerHTML=myLists.map(l=>{
-    const ids=[...(listSets[l.id]||[])].filter(id=>have.has(id));
-    const pick=ids.length?ids[Math.floor(Math.random()*ids.length)]:null;   /* a random pola from the list */
-    return `<button class="qt" data-ql="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${admin?RAW:''}th/${pick}.jpg" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}</div></button>`;
-  }).join('')||'<p class="cnt">you have no lists yet, make one below.</p>';
+  $('qlists').innerHTML=myLists.map(l=>tileHtml(l,false)).join('')||'<p class="cnt">you have no lists yet, make one below.</p>';
 }
 function openQ(){if(!queue.size)return;$('qnewname').value='';renderQ();$('qdlg').showModal()}
 async function addToList(lid){
@@ -997,11 +1034,21 @@ function curHash(){
   if(sess&&selList.size===1){const l=myLists.find(x=>x.id===[...selList][0]);if(l)return '#@'+uName()+'/'+slug(l.name)}
   return '';
 }
-function updViewbar(){
-  const t=shared?`viewing @${shared.user}'s list “${shared.name}”`:viewMsgText;
-  $('viewbar').hidden=!t;$('viewtxt').textContent=t;
+/* which list is being shown (someone else's through a link, or one of mine) */
+function viewInfo(){
+  if(shared)return {user:shared.user,name:shared.name,error:!!shared.error,msg:shared.msg};
+  if(sess&&selList.size===1){const l=myLists.find(x=>x.id===[...selList][0]);if(l)return {user:uName(),name:l.name,error:false}}
+  return null;
 }
-$('viewclear').onclick=()=>{shared=null;viewMsgText='';go()};
+function updViewbar(){
+  const v=viewInfo();
+  $('viewbar').hidden=!v;$('viewhead').hidden=!v||v.error;$('lockview').hidden=!(v&&v.error);
+  if(!v)return;
+  $('viewtxt').textContent=`viewing @${v.user}'s list “${v.name}”`;
+  $('viewhead').textContent=`@${v.user}'s "${v.name}"`;
+  if(v.error){$('empty').hidden=true;$('lockmsg').textContent=v.msg||'this list was not found, or the owner set it to private!!'}
+}
+$('viewclear').onclick=()=>{if(shared){shared=null}else{selList.clear();MSR.forEach(f=>f())}go()};
 async function applyHash(){
   let m=null;try{m=/^#@([a-z0-9_]{3,20})\/(.+)$/.exec(decodeURIComponent(routeHash||''))}catch(e){}
   if(!m||!sbOn()){hashDone=true;return}
@@ -1013,12 +1060,12 @@ async function applyHash(){
     }
     const ls=await sbReq(`/rest/v1/lists?select=id,name&owner_name=eq.${encodeURIComponent(user)}&order=created_at.asc`,{auth:false});
     const l=ls.find(x=>slug(x.name)===sg);
-    if(!l)viewMsgText='this list was not found, or it is private';
+    if(!l)shared={user,name:sg.replace(/-/g,' '),ids:new Set(),error:true};
     else{
       const rows=await sbAll(`/rest/v1/list_items?select=item_id&list_id=eq.${l.id}&order=item_id.asc`,false);
       shared={user,name:l.name,ids:new Set(rows.map(x=>x.item_id))};
     }
-  }catch(e){viewMsgText='could not open this list'}
+  }catch(e){shared={user,name:sg.replace(/-/g,' '),ids:new Set(),error:true,msg:'could not open this list, please try again later!!'}}
   hashDone=true;go();
 }
 (async()=>{
