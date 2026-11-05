@@ -160,17 +160,20 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 #viewbar[hidden]{display:none}
 .card .lb.on{background:var(--ac);color:#fff}
 .lsname{flex:1;min-width:0;text-align:left;font-weight:700;padding:8px 12px;background:var(--ac2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#qdlg{width:min(560px,94vw)}
-#qlists{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.signd .qb,.signd .qnew button{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:12px;font-weight:700;cursor:pointer}
-.qb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:170px;flex:1 1 170px;padding:14px 16px;font-size:17px}
-.qb small{font-size:12px;font-weight:500;opacity:.85}
-.qempty{text-align:center;margin:4px 0;opacity:.9}
-.qor{text-align:center;margin:14px 0;font-size:15px;opacity:.9}
-.qnew{display:flex;gap:10px;flex-wrap:wrap}
-.signd .qnew input{flex:1 1 200px;width:auto;margin:0;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:12px;padding:12px}
-.signd .qnew input::placeholder{color:rgba(255,255,255,.7)}
-.qnew button{flex:0 0 auto;padding:12px 18px;font-size:15px}
+#qdlg{width:min(660px,94vw);max-height:90vh;overflow:auto}
+#qdlg h3{font-size:20px;margin:0 0 10px}
+#qlists{display:flex;flex-wrap:wrap;gap:14px}
+.qt{display:flex;flex-direction:column;width:150px;padding:0;border:3px solid var(--cb);border-radius:12px;overflow:hidden;background:var(--card);cursor:pointer;text-align:center}
+.qt:hover,.qt:focus-visible{box-shadow:0 0 0 3px var(--ac)}
+.qt .qimg{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:var(--ac2);color:var(--mut);font-size:13px;padding:6px}
+.qt .qimg img{width:100%;height:100%;object-fit:contain}
+.qt .qname{background:var(--ac);color:#fff;font-weight:700;padding:9px 8px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qor{text-align:center;margin:16px 0 12px;font-size:16px}
+.qnew{display:flex;gap:10px}
+.qinp{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:3px solid var(--cb);border-radius:10px;padding:0 12px;background:var(--card)}
+.qinp span{font-size:20px;font-weight:700;color:var(--tx)}
+.qinp input{flex:1;min-width:0;border:0;background:none;padding:12px 0;outline:0}
+.qnew button{flex:0 0 auto;background:var(--ac);color:#fff;border:0;border-radius:10px;padding:0 24px;font-weight:700;font-size:15px}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -279,13 +282,14 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
   <div style="display:flex;justify-content:flex-end;margin-top:14px"><button id="lsclose">Close</button></div>
 </dialog>
 
-<dialog id="qdlg" class="signd">
-  <h3 style="margin:0 0 6px">add to a list</h3>
-  <p id="qinfo" style="margin:4px 0 14px;opacity:.9"></p>
+<dialog id="qdlg">
+  <h3>choose an available list</h3>
+  <p id="qinfo" class="cnt"></p>
   <div id="qlists"></div>
   <p class="qor">or</p>
-  <div class="qnew"><input id="qnewname" maxlength="40" placeholder="name of a new list"><button id="qnewbtn">create a new list</button></div>
-  <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="go" id="qclose">Close</button></div>
+  <h3 style="font-size:18px">make a new list</h3>
+  <div class="qnew"><div class="qinp"><span>＋</span><input id="qnewname" maxlength="40" placeholder="new list name" autocomplete="off"></div><button id="qnewbtn">create</button></div>
+  <div style="display:flex;justify-content:flex-end;margin-top:16px"><button id="qclose">Close</button></div>
 </dialog>
 
 <dialog id="soondlg" class="signd">
@@ -950,8 +954,13 @@ function updQueue(){
   $('qremove').hidden=!(one&&listSets[one]&&[...queue].some(id=>listSets[one].has(id)));   /* "remove from this list" only while viewing one list */
 }
 function renderQ(){
-  $('qinfo').textContent=queue.size+' pola in queue';
-  $('qlists').innerHTML=myLists.map(l=>`<button class="qb" data-ql="${l.id}">${esc(l.name)}<small>${(listSets[l.id]||new Set()).size} pola</small></button>`).join('')||'<p class="qempty">you have no lists yet.</p>';
+  $('qinfo').textContent=queue.size+' pola in queue: tap a list to add them';
+  const have=new Set(items.map(i=>i.id));
+  $('qlists').innerHTML=myLists.map(l=>{
+    const ids=[...(listSets[l.id]||[])].filter(id=>have.has(id));
+    const pick=ids.length?ids[Math.floor(Math.random()*ids.length)]:null;   /* a random pola from the list */
+    return `<button class="qt" data-ql="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${admin?RAW:''}th/${pick}.jpg" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}</div></button>`;
+  }).join('')||'<p class="cnt">you have no lists yet, make one below.</p>';
 }
 function openQ(){if(!queue.size)return;$('qnewname').value='';renderQ();$('qdlg').showModal()}
 async function addToList(lid){
