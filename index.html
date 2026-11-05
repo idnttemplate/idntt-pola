@@ -87,11 +87,11 @@ dialog input,dialog select,dialog textarea{width:100%}
 .cg button.end::after{background:#fff}
 .ext{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;cursor:pointer}
 .ext input{width:auto;padding:0;margin:0}
-#aboutdlg,#tpldlg,#notesdlg,#wlguide{width:50vw;min-height:50vh;padding:28px 34px;font-size:16px;line-height:1.6}
-#aboutdlg[open],#tpldlg[open],#notesdlg[open],#wlguide[open]{display:flex;flex-direction:column}
-#aboutdlg h3,#tpldlg h3,#notesdlg h3,#wlguide h3{font-size:24px}
+#aboutdlg,#tpldlg,#notesdlg{width:50vw;min-height:50vh;padding:28px 34px;font-size:16px;line-height:1.6}
+#aboutdlg[open],#tpldlg[open],#notesdlg[open][open]{display:flex;flex-direction:column}
+#aboutdlg h3,#tpldlg h3,#notesdlg h3 h3{font-size:24px}
 #aboutdlg .ab-close,#tpldlg .ab-close,#notesdlg .ab-close{margin-top:auto;align-self:flex-end}
-@media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg,#wlguide{width:92vw}}
+@media (max-width:700px){#aboutdlg,#tpldlg,#notesdlg{width:92vw}}
 .signd .lnk{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);font-weight:700}   /* same look for Sheet, Template and admin sign in */
 .lnks{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:10px 0 18px}
 .lnk{display:inline-flex;align-items:center;justify-content:center;width:170px;padding:8px 0;font-size:15px;line-height:1.3;border-radius:12px;text-decoration:none;cursor:pointer}
@@ -147,28 +147,30 @@ a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;bo
 .ei2{background:#005b96;color:#fff;border-color:#005b96;color-scheme:dark}
 .ei3 .mg{background:#b3cde0;border-color:#b3cde0}
 .ei3 .mg label{color:#000}
-#wlguide p{margin:8px 0}
-body:not(.admin) .card .wl,body:not(.admin) #wlbar{display:none!important}   /* wishlist is admin-only for now */
-.card .wl{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:16px;line-height:1;z-index:2;cursor:pointer}
-.card .wl.on{background:var(--ac);color:#fff;border-color:var(--ac)}
-#wlbar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;background:var(--ac);color:#fff;border-radius:99px;padding:8px 10px 8px 18px;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:14px;white-space:nowrap}
-#wlbar[hidden]{display:none}
-#wlbar button{background:#fff;color:var(--ac);border:0;border-radius:99px;padding:6px 14px;font-weight:700;font-size:13px}
-#wlmk{width:min(920px,94vw);max-height:92vh;overflow:auto}
-.wlitems{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.wlchip{font-size:12.5px;background:var(--ac2);border:1px solid var(--bd);border-radius:99px;padding:3px 6px 3px 10px;display:inline-flex;align-items:center;gap:6px}
-.wlchip button{padding:0 6px;border-radius:99px;font-size:12px;line-height:1.6}
-.wlpg{margin:14px 0;text-align:center}
-.wlpg img{max-width:min(100%,480px);height:auto;border-radius:12px;display:block;margin:0 auto 8px;border:1px solid var(--bd)}
-.lnk2{display:inline-block;background:var(--ac);color:#fff;font-weight:700;padding:8px 16px;border-radius:10px;text-decoration:none}
 body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 .card .lb{position:absolute;top:6px;right:6px;width:28px;height:28px;padding:0;border-radius:50%;background:rgba(255,255,255,.92);color:var(--ac);border:1px solid var(--ac);font-size:18px;line-height:1;z-index:2;cursor:pointer}
-body.user .card .wl{top:38px}
 .lsrow{display:flex;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
-.lsrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#lsdlg,#lspick{width:min(520px,94vw);max-height:90vh;overflow:auto}
-#lspicklist label{display:flex;gap:8px;align-items:center;margin:0;padding:6px 0;font-size:14px;color:var(--tx)}
-#lspicklist input{width:auto;padding:0;margin:0}
+#lsdlg{width:min(520px,94vw);max-height:90vh;overflow:auto}
+#qbar{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:94vw;background:var(--ac);color:#fff;border-radius:22px;padding:8px 12px 8px 18px;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:14px}
+#qbar[hidden],#qbar button[hidden]{display:none}
+#qbar button{background:#fff;color:var(--ac);border:0;border-radius:99px;padding:6px 14px;font-weight:700;font-size:13px}
+#toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;background:#111;color:#fff;border-radius:10px;padding:10px 16px;font-size:14px;max-width:90vw;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#toast[hidden]{display:none}
+#viewbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ac2);border:1px solid var(--ac);border-radius:12px;padding:8px 12px;margin:8px 0;font-size:14px}
+#viewbar[hidden]{display:none}
+.card .lb.on{background:var(--ac);color:#fff}
+.lsname{flex:1;min-width:0;text-align:left;font-weight:700;padding:8px 12px;background:var(--ac2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#qdlg{width:min(560px,94vw)}
+#qlists{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.signd .qb,.signd .qnew button{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:12px;font-weight:700;cursor:pointer}
+.qb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:170px;flex:1 1 170px;padding:14px 16px;font-size:17px}
+.qb small{font-size:12px;font-weight:500;opacity:.85}
+.qempty{text-align:center;margin:4px 0;opacity:.9}
+.qor{text-align:center;margin:14px 0;font-size:15px;opacity:.9}
+.qnew{display:flex;gap:10px;flex-wrap:wrap}
+.signd .qnew input{flex:1 1 200px;width:auto;margin:0;background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.45);border-radius:12px;padding:12px}
+.signd .qnew input::placeholder{color:rgba(255,255,255,.7)}
+.qnew button{flex:0 0 auto;padding:12px 18px;font-size:15px}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -197,7 +199,6 @@ body.user .card .wl{top:38px}
     <button id="notes" class="sm holo">Notes</button>
     <button id="evbtn" class="sm holo">Events</button>
     <button id="lsbtn" class="sm pri">Lists</button>
-    <button id="wlbtn" class="sm pri">Wishlist</button>
     <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
     <button id="about" class="sm pri">About</button>
   </div>
@@ -226,6 +227,7 @@ body.user .card .wl{top:38px}
     <button class="sm" id="bkclr">Clear selection</button>
     <button class="sm" id="bkdel" style="color:#fff;background:var(--danger);border-color:var(--danger)">Delete selected</button>
   </div>
+  <div id="viewbar" hidden><span id="viewtxt"></span><button class="sm" id="viewclear">clear</button></div>
   <div class="cnt" id="cnt"></div>
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" hidden>No pola yet.</div>
@@ -257,7 +259,8 @@ body.user .card .wl{top:38px}
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px"><button id="evcancel">Cancel</button><button class="pri" id="evsave">Save</button></div>
 </dialog>
 
-<div id="wlbar" hidden><span>♥ <b id="wln">0</b> in wishlist</span><button id="wlopen">Make wishlist</button><button id="wlclr2">Clear</button></div>
+<div id="qbar" hidden><span>♥ <b id="qn">0</b> in queue</span><button id="qadd">add to a list</button><button id="qremove" hidden>remove from this list</button><button id="qclear">clear</button></div>
+<div id="toast" hidden></div>
 
 <dialog id="lsdlg">
   <h3 style="margin:0 0 8px">my lists</h3>
@@ -276,35 +279,19 @@ body.user .card .wl{top:38px}
   <div style="display:flex;justify-content:flex-end;margin-top:14px"><button id="lsclose">Close</button></div>
 </dialog>
 
-<dialog id="lspick">
-  <h3 style="margin:0 0 8px">add to list</h3>
-  <div id="lspicklist"></div>
-  <div style="display:flex;gap:8px;margin:12px 0"><input id="lspicknew" maxlength="40" placeholder="new list name"><button class="pri" id="lspickadd" style="white-space:nowrap">new list</button></div>
-  <div style="display:flex;justify-content:flex-end"><button id="lspickclose">Done</button></div>
+<dialog id="qdlg" class="signd">
+  <h3 style="margin:0 0 6px">add to a list</h3>
+  <p id="qinfo" style="margin:4px 0 14px;opacity:.9"></p>
+  <div id="qlists"></div>
+  <p class="qor">or</p>
+  <div class="qnew"><input id="qnewname" maxlength="40" placeholder="name of a new list"><button id="qnewbtn">create a new list</button></div>
+  <div style="display:flex;justify-content:flex-end;margin-top:16px"><button class="go" id="qclose">Close</button></div>
 </dialog>
 
 <dialog id="soondlg" class="signd">
-  <h3 id="soontitle" style="margin:0 0 10px">Wishlist</h3>
+  <h3 id="soontitle" style="margin:0 0 10px">Lists</h3>
   <p style="margin:8px 0">coming soon</p>
   <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="go" id="soonclose">Close</button></div>
-</dialog>
-
-<dialog id="wlguide" class="signd">
-  <h3 style="margin:0 0 14px">Wishlist guide</h3>
-  <p>1. tap the ♡ on every pola you want to add to your wishlist.</p>
-  <p>2. open your wishlist with the button at the bottom of the screen and type your username.</p>
-  <p>3. download your image</p>
-  <div style="margin-top:auto;display:flex;gap:10px;justify-content:flex-end"><button class="go" id="wlmake">Make my wishlist</button><button class="go" id="wlgclose">Close</button></div>
-</dialog>
-
-<dialog id="wlmk">
-  <h3 style="margin:0 0 6px">My wishlist</h3>
-  <label>username</label><input id="wluser" placeholder="username" maxlength="30" autocomplete="off">
-  <div id="wlitems" class="wlitems"></div>
-  <div style="margin:6px 0"><button class="sm" id="wlclear">Clear all</button></div>
-  <div id="wlprev"></div>
-  <p class="cnt">on your phone, please press and hold the picture to save if the download button doesn't work!</p>
-  <div style="display:flex;justify-content:flex-end;margin-top:10px"><button id="wlmkclose">Close</button></div>
 </dialog>
 
 <dialog id="notesdlg">
@@ -388,7 +375,7 @@ const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov',
 /* ===== state ===== */
 const GH=`https://api.github.com/repos/${CFG.owner}/${CFG.repo}`;
 const RAW=`https://raw.githubusercontent.com/${CFG.owner}/${CFG.repo}/${CFG.branch}/`;
-let items=[],events=[],evPicked=new Set(),wish=[],lastList=[],picked=new Set(),admin=false,unsortedOnly=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
+let items=[],events=[],evPicked=new Set(),queue=new Set(),shared=null,lastList=[],picked=new Set(),admin=false,unsortedOnly=false,sortD='desc',range=null,ext=false,editId=null,shown=PAGE,token='',calM=new Date();
 try{token=localStorage.getItem('pob-gh')||''}catch(e){}
 calM=new Date(Math.max(calM,new Date(MIN.y,MIN.m,1)));calM.setDate(1);
 const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -508,7 +495,7 @@ function render(){
   MSF['ms-shop'](shops.map(v=>({v,t:v})));
   $('shops').innerHTML=shops.map(v=>`<option value="${esc(v)}">`).join('');
   const toks=q.split(/\s+/).filter(Boolean).flatMap(t=>(TOKMAP[t]||t).split(' '));
-  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!selImage.size||selImage.has(i.image||'real image'))&&(!selList.size||[...selList].some(id=>listSets[id]&&listSets[id].has(i.id)))&&(!unsortedOnly||isUnsorted(i))
+  const list=items.filter(i=>inRange(i.date)&&(!selShop.size||selShop.has(i.shop))&&(!selMem.size||mm(i).some(n=>selMem.has(String(n))))&&(!selEra.size||selEra.has(i.era))&&(!selRound.size||selRound.has(i.round))&&(!selType.size||((i.types||[]).length?i.types.some(t=>selType.has(t)):selType.has('__none')))&&(!selImage.size||selImage.has(i.image||'real image'))&&(!selList.size||[...selList].some(id=>listSets[id]&&listSets[id].has(i.id)))&&(!shared||shared.ids.has(i.id))&&(!unsortedOnly||isUnsorted(i))
     &&(!toks.length||(h=>toks.every(t=>okTok(i,t,h)))(norm([i.shop,memTxt(i),mm(i).map(n=>'id'+n).join(' '),i.era,i.round,(i.types||[]).join(' '),i.desc,i.image||'real image',i.date].filter(Boolean).join(' ')))));
   const mn=i=>mm(i)[0]||999,mx=i=>mm(i).length?mm(i)[mm(i).length-1]:-1;
   list.sort((a,b)=>{
@@ -521,10 +508,9 @@ function render(){
     return mn(a)-mn(b);                                            /* 4. member id1 -> id24 */
   });
   lastList=list;
-  if(items.length)wish=wish.filter(id=>items.some(i=>i.id===id));
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
-  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="wl${wish.includes(i.id)?' on':''}" data-w="${i.id}" title="Add to wishlist">${wish.includes(i.id)?'♥':'♡'}</button><button class="lb" data-lb="${i.id}" title="add to a list">＋</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
+  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="lb${queue.has(i.id)?' on':''}" data-lb="${i.id}" title="add to the queue">${queue.has(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
    <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="era" style="color:${ERA_COLORS[i.era]||'var(--mut)'}">${esc(i.era)||'&nbsp;'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
@@ -533,7 +519,7 @@ function render(){
   $('unsorted').textContent='Unsorted ('+items.filter(isUnsorted).length+')';$('unsorted').classList.toggle('on',unsortedOnly);
   $('calbtn').textContent='📅 '+(range?(range.b&&range.b!==range.a?fmt(range.a<range.b?range.a:range.b)+' → '+fmt(range.a<range.b?range.b:range.a):fmt(range.a))+(ext?' ±2d':''):'Date');
   $('calbtn').classList.toggle('on',!!range);
-  updBulk();updWish();syncUrl();
+  updBulk();updQueue();updViewbar();syncUrl();
 }
 const go=()=>{shown=PAGE;render()};
 $('more').onclick=()=>{shown+=PAGE;render()};
@@ -725,9 +711,8 @@ function openView(it){
 $('vx').onclick=()=>$('view').close();
 $('view').addEventListener('click',e=>{if(e.target===$('view'))$('view').close()});
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('[data-v],[data-e],[data-x],[data-w],[data-lb]');if(!t)return;
-  if(t.dataset.lb)openPick(t.dataset.lb);
-  else if(t.dataset.w)toggleWish(t.dataset.w);
+  const t=e.target.closest('[data-v],[data-e],[data-x],[data-lb]');if(!t)return;
+  if(t.dataset.lb)toggleQueue(t.dataset.lb);
   else if(t.dataset.v)openView(items.find(i=>i.id===t.dataset.v));
   else if(admin&&t.dataset.e)openDlg(items.find(x=>x.id===t.dataset.e));
   else if(admin&&t.dataset.x&&confirm('Delete this image?')){
@@ -779,155 +764,6 @@ $('evsave').onclick=async()=>{
 window.addEventListener('scroll',()=>{$('totop').hidden=window.scrollY<300},{passive:true});
 $('totop').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
-/* ===== wishlist: images are built in the visitor's browser, nothing is stored on a server ===== */
-/*WL-PURE-START*/
-const WL={
-  color:'#57bfdf',font:'Lexend',          /* "by: @username": light blue of the FOUND star */
-  useDeco:false,                          /* layer 3 is switched off for now: set to true to bring it back */
-  fonts:{name:"'Yellowtail', cursive",shop:"'Bebas Neue', Impact, sans-serif"},   /* member name + username: Yellowtail (free script, similar to Handelson Three); shop: Bebas Neue (free condensed sans, similar to Rahong Medium). Both come from Google Fonts */
-  colors:{name:'#ff6f91',shop:'#409cb8'},   /* pink of the PRIORITY star, blue of the OTW star */
-  user:{x:372,y:1882,w:1263,h:88},      /* purple bar of layer 4: "@username" */
-  templates:[                           /* sorted by max; a template is chosen by number of pola on that image */
-    {max:12,W:2000,H:2000,
-     bg:['wishlist/1_1.png','wishlist/1.1.png','1_1.png','1.1.png'],deco:['wishlist/1_3.png','wishlist/1.3.png','1_3.png','1.3.png'],   /* layer 1 (base) and layer 3 (decoration): the first file name that exists is used */
-     cols:[84,395,706,1017,1328,1639],rows:[779,1367],sw:275,sh:413,   /* pola slots (from the layer 2 mask) */
-     name:{dy:-72,h:58},round:{dy:427,h:58},                  /* yellow boxes above / below each slot */
-     star:{dx:-55,dy:-16,w:112,h:109}}                        /* decoration that belongs to each slot */
-  ]
-};
-WL.templates.forEach(t=>{t.slots=t.rows.flatMap(y=>t.cols.map(x=>({x,y,w:t.sw,h:t.sh})))});
-const wlMax=Math.max(...WL.templates.map(t=>t.max));
-/* even split over the fewest images, e.g. 13 -> 7+6, 39 -> 13+13+13 */
-const splitEven=(n,max)=>{const p=Math.ceil(n/max),b=Math.floor(n/p),r=n%p;return Array.from({length:p},(_,i)=>b+(i<r?1:0))};
-const pickTpl=n=>WL.templates.find(t=>t.max>=n)||WL.templates[WL.templates.length-1];
-/* fill row by row; a row that is not full is centred against the full row */
-function wishLayout(t,n){
-  const per=t.cols.length,out=[];let k=0;
-  for(let r=0;r<t.rows.length&&k<n;r++){
-    const cnt=Math.min(per,n-k),row=t.slots.slice(r*per,r*per+per);
-    const full=(row[0].x+row[per-1].x+row[per-1].w)-row[0].x;
-    const usedR=row[cnt-1].x+row[cnt-1].w,dx=((row[0].x+row[per-1].x+row[per-1].w)-(row[0].x+usedR))/2;
-    for(let j=0;j<cnt;j++)out.push({s:row[j],dx,i:k++});
-  }
-  return out;
-}
-/*WL-PURE-END*/
-const loadAny=async list=>{for(const s of [].concat(list)){try{return await loadImg(s)}catch(e){}}throw new Error('template image not found')};
-const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>res(im);im.onerror=()=>rej(new Error('load '+src));im.src=src});
-function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
-function drawFit(g,text,cx,cy,w,max,min,weight){
-  const f=z=>`${weight} ${z}px ${WL.font}, system-ui, sans-serif`;
-  let s=max;g.font=f(s);
-  while(s>min&&g.measureText(text).width>w){s-=1;g.font=f(s)}
-  let t=text;
-  if(g.measureText(t).width>w){while(t.length>1&&g.measureText(t+'…').width>w)t=t.slice(0,-1);t+='…'}
-  g.fillText(t,cx,cy);
-}
-function fitText(g,text,w,max,min,fam,weight){
-  const f=z=>`${weight} ${z}px ${fam}`;
-  let s=max;g.font=f(s);
-  while(s>min&&g.measureText(text).width>w){s-=1;g.font=f(s)}
-  let t=text;
-  if(g.measureText(t).width>w){while(t.length>1&&g.measureText(t+'…').width>w)t=t.slice(0,-1);t+='…'}
-  return {t,font:f(s)};
-}
-/* spacing: the shop label sits at half of its old (centred) gap under the pola; the member name is
-   placed the same distance above the pola, so both gaps are equal */
-function labelGap(g,t,o){
-  g.font=`${o.weight} ${o.max}px ${o.fam}`;
-  const asc=g.measureText('H').actualBoundingBoxAscent;
-  return Math.max(4,((t.round.dy+t.round.h/2-t.sh)-asc/2)/2);
-}
-function drawLabel(g,text,cx,slotTop,slotH,dir,gap,o){
-  const r=fitText(g,text,o.w,o.max,o.min,o.fam,o.weight);g.font=r.font;
-  const asc=g.measureText('H').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
-  /* above the pola: the baseline is `gap` above it; below the pola: the top of the capitals is `gap` under it */
-  const base=dir<0?Math.min(slotTop-gap,slotTop-desc-4):slotTop+slotH+gap+asc;
-  g.textBaseline='alphabetic';g.fillStyle=o.color;
-  if(o.bold){g.lineWidth=o.bold;g.strokeStyle=o.color;g.lineJoin='round';g.strokeText(r.t,cx,base)}
-  g.fillText(r.t,cx,base);
-}
-async function drawWish(t,list,user){
-  const c=document.createElement('canvas');c.width=t.W;c.height=t.H;
-  const g=c.getContext('2d');
-  const [bg,deco]=await Promise.all([loadAny(t.bg),WL.useDeco?loadAny(t.deco).catch(()=>null):null]);
-  const imgs=await Promise.all(list.map(i=>loadImg('th/'+i.id+'.jpg').catch(()=>null)));
-  g.drawImage(bg,0,0,t.W,t.H);                                          /* layer 1: base */
-  const lay=wishLayout(t,list.length);
-  lay.forEach(({s,dx,i})=>{                                             /* layer 2: pola */
-    const x=s.x+dx,im=imgs[i];
-    g.save();rr(g,x,s.y,s.w,s.h,18);g.clip();
-    if(im){const k=Math.min(s.w/im.width,s.h/im.height),dw=im.width*k,dh=im.height*k;g.drawImage(im,x+(s.w-dw)/2,s.y+(s.h-dh)/2,dw,dh)}
-    else{g.fillStyle='#ddd';g.fillRect(x,s.y,s.w,s.h)}
-    g.restore();
-  });
-  if(deco)lay.forEach(({s,dx})=>{const r=t.star;g.drawImage(deco,s.x+r.dx,s.y+r.dy,r.w,r.h,s.x+r.dx+dx,s.y+r.dy,r.w,r.h)});   /* layer 3: decoration (only for used slots) */
-  g.textAlign='center';   /* layer 4: text */
-  const oName={max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.name,bold:1.2},   /* member name now uses the same font as the shop name */
-        oShop={max:42,min:18,fam:WL.fonts.shop,weight:400,color:WL.colors.shop,bold:1.2};
-  const gap=labelGap(g,t,oShop);
-  lay.forEach(({s,dx,i})=>{
-    const it=list[i],cx=s.x+dx+s.w/2;
-    drawLabel(g,memTxt(it)||'—',cx,s.y,s.h,-1,gap,{...oName,w:s.w-12});
-    drawLabel(g,[it.shop,hideRound(it.round)?'':it.round].filter(Boolean).join(' ')||'—',cx,s.y,s.h,1,gap,{...oShop,w:s.w-12});
-  });
-  if(user){                                                              /* "by: @username" in the same script font */
-    const r=fitText(g,'by: @'+user,WL.user.w-40,64,28,WL.fonts.name,400);g.font=r.font;
-    const asc=g.measureText('Hd').actualBoundingBoxAscent,desc=g.measureText('gy').actualBoundingBoxDescent;
-    g.textBaseline='alphabetic';g.fillStyle=WL.color;
-    g.shadowColor='rgba(24,84,112,.5)';g.shadowBlur=7;g.shadowOffsetX=3;g.shadowOffsetY=4;   /* soft shadow so the username stands out */
-    g.fillText(r.t,WL.user.x+WL.user.w/2,WL.user.y+WL.user.h/2+(asc-desc)/2);
-    g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetX=0;g.shadowOffsetY=0;
-  }
-  return c;
-}
-try{wish=JSON.parse(localStorage.getItem('pob-wish')||'[]')}catch(e){wish=[]}
-const saveWish=()=>{try{localStorage.setItem('pob-wish',JSON.stringify(wish))}catch(e){}};
-function updWish(){$('wlbar').hidden=!wish.length;$('wln').textContent=wish.length}
-const wlList=()=>wish.map(id=>items.find(i=>i.id===id)).filter(Boolean);
-function renderWL(){
-  $('wlitems').innerHTML=wlList().map((i,k)=>`<span class="wlchip">${k+1}. ${esc(memTxt(i)||'—')} · ${esc(titleOf(i)||'—')} <button data-wr="${i.id}" title="Remove">✕</button></span>`).join('')||'<span class="cnt">your wishlist is empty. tap ♡ on a pola to add it.</span>';
-}
-let wlSeq=0,wlUrls=[];
-async function buildWish(){
-  const seq=++wlSeq,list=wlList(),box=$('wlprev');
-  if(!list.length){box.innerHTML='';return}
-  box.innerHTML='<p class="cnt">Creating your image…</p>';
-  try{
-    await Promise.allSettled([document.fonts.load('700 30px Lexend'),document.fonts.load('400 30px Yellowtail'),document.fonts.load('400 30px "Bebas Neue"')]);
-    const sizes=splitEven(list.length,wlMax),user=$('wluser').value.trim().replace(/^@+/,'');
-    const urls=[],html=[];let at=0;
-    for(let p=0;p<sizes.length;p++){
-      const part=list.slice(at,at+sizes[p]);at+=sizes[p];
-      const cv=await drawWish(pickTpl(part.length),part,user);
-      if(seq!==wlSeq)return;
-      const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
-      const u=URL.createObjectURL(blob);urls.push(u);
-      html.push(`<div class="wlpg"><img src="${u}" alt="wishlist ${p+1}"><a class="lnk2" href="${u}" download="wishlist-${p+1}.png">⬇ Download PNG${sizes.length>1?` ${p+1}/${sizes.length}`:''}</a></div>`);
-    }
-    if(seq!==wlSeq)return;
-    wlUrls.forEach(u=>URL.revokeObjectURL(u));wlUrls=urls;box.innerHTML=html.join('');
-  }catch(e){box.innerHTML='<p class="cnt">Could not create the image: '+esc(e.message)+'. Please check that wishlist/1_1.png and wishlist/1_3.png (underscore in the name) are in the repository.</p>'}
-}
-function openWL(){
-  try{$('wluser').value=localStorage.getItem('pob-wluser')||''}catch(e){}
-  renderWL();$('wlmk').showModal();buildWish();
-}
-function toggleWish(id){
-  const k=wish.indexOf(id);k<0?wish.push(id):wish.splice(k,1);saveWish();render();
-  if($('wlmk').open){renderWL();buildWish()}
-}
-function clearWish(){wish=[];saveWish();render();if($('wlmk').open){renderWL();buildWish()}}
-let wlT;
-$('wluser').oninput=()=>{try{localStorage.setItem('pob-wluser',$('wluser').value)}catch(e){}clearTimeout(wlT);wlT=setTimeout(buildWish,350)};
-$('wlitems').onclick=e=>{const b=e.target.closest('[data-wr]');if(b)toggleWish(b.dataset.wr)};
-$('wlbtn').onclick=()=>{if(admin)$('wlguide').showModal();else{$('soontitle').textContent='Wishlist';$('soondlg').showModal()}};   /* viewers: coming soon, admin: full feature */
-$('soonclose').onclick=()=>$('soondlg').close();
-$('wlgclose').onclick=()=>$('wlguide').close();
-$('wlmake').onclick=()=>{$('wlguide').close();openWL()};
-$('wlopen').onclick=openWL;
-$('wlclr2').onclick=clearWish;$('wlclear').onclick=clearWish;
-$('wlmkclose').onclick=()=>$('wlmk').close();
 
 /* sign in = GitHub token with write access to this repo */
 async function verify(t){
@@ -970,15 +806,16 @@ $('ntsave').onclick=async()=>{
   finally{$('ntsave').disabled=false}
 };
 /* ===== accounts + personal lists (Supabase) =====
-   Fill in SB below to switch this on. url = Project URL, key = anon / publishable key (it is meant to be public;
-   what each person may read or write is limited by the row level security rules in supabase-setup.sql).
-   domain = only used to turn a username into a login address (nobody receives mail there). */
+   url = Project URL, key = publishable / anon key (meant to be public: what each person can read or write is limited
+   by the row level security rules in supabase-setup.sql). domain = only used to turn a username into a login address. */
 const SB={url:'https://vxqjubyylfhxcfkrnyed.supabase.co',key:'sb_publishable_pqSZ29At1WV5Tj8xee9ZOw_C714Xw1D',domain:'idnttemplate.github.io'};
-let sess=null,myLists=[],listSets={};
+let sess=null,myLists=[],listSets={},hashDone=false,viewMsgText='';
+const routeHash=location.hash;                     /* e.g. #@username/list-name, read once at start */
 try{sess=JSON.parse(localStorage.getItem('pob-sb')||'null')}catch(e){}
 const sbOn=()=>!!(SB.url&&SB.key);
 const uEmail=u=>u.includes('@')?u:`${u}@${SB.domain}`;
 const uName=()=>sess&&sess.user&&sess.user.email?sess.user.email.split('@')[0]:'';
+const userId=()=>{if(sess&&sess.user&&sess.user.id)return sess.user.id;try{return JSON.parse(atob(sess.access_token.split('.')[1])).sub}catch(e){return ''}};
 async function sbReq(path,{method='GET',body,auth=true,prefer}={}){
   if(auth&&sess&&sess.expires_at*1000<Date.now()+30000)await sbRefresh();
   const h={apikey:SB.key,'Content-Type':'application/json'};
@@ -998,21 +835,24 @@ async function sbRefresh(){
   try{saveSess(await sbReq('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:sess.refresh_token},auth:false}))}
   catch(e){logoutLocal()}
 }
-async function sbAll(path){            /* PostgREST returns at most 1000 rows per request: read page by page */
+async function sbAll(path,auth=true){            /* PostgREST returns at most 1000 rows per request: read page by page */
   const out=[];
   for(let a=0;;a+=1000){
-    const rows=await sbReq(path+'&limit=1000&offset='+a);
+    const rows=await sbReq(path+'&limit=1000&offset='+a,{auth});
     out.push(...rows);if(rows.length<1000)break;
   }
   return out;
 }
 const selList=makeMS('ms-list','List',[]);
+const syncListOpts=()=>MSF['ms-list'](myLists.map(l=>({v:l.id,t:l.name})));
 async function loadLists(){
-  const ls=await sbAll('/rest/v1/lists?select=id,name&order=created_at.asc');
-  const li=await sbAll('/rest/v1/list_items?select=list_id,item_id&order=created_at.asc,item_id.asc');
+  const ls=await sbAll(`/rest/v1/lists?select=id,name,is_public&user_id=eq.${userId()}&order=created_at.asc`);
   myLists=ls;listSets={};ls.forEach(l=>listSets[l.id]=new Set());
-  li.forEach(x=>{if(listSets[x.list_id])listSets[x.list_id].add(x.item_id)});
-  MSF['ms-list'](myLists.map(l=>({v:l.id,t:l.name})));
+  if(ls.length){
+    const li=await sbAll(`/rest/v1/list_items?select=list_id,item_id&list_id=in.(${ls.map(l=>l.id).join(',')})&order=created_at.asc,item_id.asc`);
+    li.forEach(x=>{if(listSets[x.list_id])listSets[x.list_id].add(x.item_id)});
+  }
+  syncListOpts();
 }
 async function afterLogin(){
   document.body.classList.add('user');
@@ -1021,8 +861,8 @@ async function afterLogin(){
 }
 function logoutLocal(){
   sess=null;try{localStorage.removeItem('pob-sb')}catch(e){}
-  document.body.classList.remove('user');myLists=[];listSets={};
-  MSF['ms-list']([]);selList.clear();MSR.forEach(f=>f());renderLs();render();
+  document.body.classList.remove('user');myLists=[];listSets={};queue.clear();
+  syncListOpts();selList.clear();MSR.forEach(f=>f());renderLs();render();
 }
 const friendly=m=>/invalid login/i.test(m)?'wrong username or password':/already registered|already been registered/i.test(m)?'this username is already taken':/password/i.test(m)&&/6|least|short|weak/i.test(m)?'password must have at least 6 characters':/signups? (are )?(not allowed|disabled)/i.test(m)?'new accounts are switched off':/invalid/i.test(m)&&/email/i.test(m)?'the username was refused (see the guide: change SB.domain)':m;
 async function lsAuth(kind){
@@ -1036,26 +876,30 @@ async function lsAuth(kind){
     saveSess(j);$('lspass').value='';await afterLogin();
   }catch(e){$('lserr').textContent=friendly(e.message)}
 }
+const shareLink=l=>location.origin+location.pathname+'#@'+uName()+'/'+slug(l.name);
 function renderLs(){
   const on=!!sess;
   $('lsauth').hidden=on;$('lsmain').hidden=!on;
   if(!on)return;
   $('lshi').textContent=uName();
   const have=new Set(items.map(i=>i.id));
-  $('lslists').innerHTML=myLists.map(l=>`<div class="lsrow"><span class="nm">${esc(l.name)} <span class="cnt">(${[...(listSets[l.id]||[])].filter(id=>have.has(id)).length})</span></span><button class="sm" data-lv="${l.id}">view</button><button class="sm" data-lr="${l.id}" title="rename">✎</button><button class="sm" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div>`).join('')||'<p class="cnt">no lists yet. add your first list above.</p>';
+  $('lslists').innerHTML=myLists.map(l=>`<div class="lsrow"><button class="lsname" data-lv="${l.id}" title="show only this list">${esc(l.name)} <span class="cnt">(${[...(listSets[l.id]||[])].filter(id=>have.has(id)).length})</span></button><button class="sm" data-lp="${l.id}" title="${l.is_public===false?'private: only you can open it. click to make it public':'public: anyone with the link can view it. click to make it private'}">${l.is_public===false?'🔒':'🌐'}</button><button class="sm" data-lc="${l.id}" title="copy the link of this list">🔗</button><button class="sm" data-lr="${l.id}" title="rename">✎</button><button class="sm" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div>`).join('')||'<p class="cnt">no lists yet. add your first list above.</p>';
 }
 async function createList(name){
   name=name.trim().slice(0,40);if(!name)return null;
+  if(myLists.some(l=>slug(l.name)===slug(name)))throw new Error('you already have a list with this name');
   const j=await sbReq('/rest/v1/lists',{method:'POST',body:{name},prefer:'return=representation'});
   const l=Array.isArray(j)?j[0]:j;
-  myLists.push({id:l.id,name:l.name});listSets[l.id]=new Set();
-  MSF['ms-list'](myLists.map(x=>({v:x.id,t:x.name})));
+  myLists.push({id:l.id,name:l.name,is_public:l.is_public!==false});listSets[l.id]=new Set();
+  syncListOpts();
   return l;
 }
 function openLs(){
-  if(!sbOn()){$('soontitle').textContent='Lists';$('soondlg').showModal();return}
+  if(!sbOn()){$('soondlg').showModal();return}
   $('lserr').textContent='';renderLs();$('lsdlg').showModal();
 }
+let toastT;
+function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true},2800)}
 $('lsbtn').onclick=openLs;
 $('lsclose').onclick=()=>$('lsdlg').close();
 $('lslogin').onclick=()=>lsAuth('in');
@@ -1070,45 +914,109 @@ $('lslists').onclick=async e=>{
   const b=e.target.closest('button');if(!b)return;
   const d=b.dataset;
   try{
-    if(d.lv){selList.clear();selList.add(d.lv);MSR.forEach(f=>f());$('lsdlg').close();go();window.scrollTo({top:0,behavior:'smooth'})}
+    if(d.lv){shared=null;viewMsgText='';selList.clear();selList.add(d.lv);MSR.forEach(f=>f());$('lsdlg').close();go();window.scrollTo({top:0,behavior:'smooth'})}   /* = sort -> list -> this list */
+    else if(d.lp){
+      const l=myLists.find(x=>x.id===d.lp),v=l.is_public===false;
+      await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.lp),{method:'PATCH',body:{is_public:v}});l.is_public=v;renderLs();
+      toast(v?'this list is public now':'this list is private now');
+    }
+    else if(d.lc){
+      const l=myLists.find(x=>x.id===d.lc),u=shareLink(l);
+      try{await navigator.clipboard.writeText(u);toast(l.is_public===false?'link copied. the list is private, so others cannot open it yet':'link copied')}catch(x){prompt('copy this link',u)}
+    }
     else if(d.lr){
       const l=myLists.find(x=>x.id===d.lr),n=prompt('rename list',l.name);
-      if(n&&n.trim()){await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.lr),{method:'PATCH',body:{name:n.trim().slice(0,40)}});l.name=n.trim().slice(0,40);MSF['ms-list'](myLists.map(x=>({v:x.id,t:x.name})));renderLs()}
+      if(n&&n.trim()){
+        if(myLists.some(x=>x.id!==l.id&&slug(x.name)===slug(n)))throw new Error('you already have a list with this name');
+        await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.lr),{method:'PATCH',body:{name:n.trim().slice(0,40)}});l.name=n.trim().slice(0,40);syncListOpts();renderLs();
+      }
     }
     else if(d.ld){
       const l=myLists.find(x=>x.id===d.ld);
       if(confirm(`Delete the list "${l.name}"? The pola themselves stay on the site.`)){
         await sbReq('/rest/v1/lists?id=eq.'+encodeURIComponent(d.ld),{method:'DELETE'});
         myLists=myLists.filter(x=>x.id!==d.ld);delete listSets[d.ld];selList.delete(d.ld);
-        MSF['ms-list'](myLists.map(x=>({v:x.id,t:x.name})));renderLs();render();
+        syncListOpts();renderLs();render();
       }
     }
   }catch(err){alert('Failed: '+err.message)}
 };
-/* "+" on a card: tick the lists this pola belongs to */
-let pickId=null;
-function renderPick(){
-  $('lspicklist').innerHTML=myLists.map(l=>`<label><input type="checkbox" data-pl="${l.id}" ${listSets[l.id]&&listSets[l.id].has(pickId)?'checked':''}> ${esc(l.name)}</label>`).join('')||'<p class="cnt">no lists yet, create one below.</p>';
+
+/* hearts: pick several pola (the queue), then add them to a list in one go */
+function toggleQueue(id){queue.has(id)?queue.delete(id):queue.add(id);render()}
+function updQueue(){
+  $('qbar').hidden=!(sess&&queue.size);$('qn').textContent=queue.size;
+  const one=selList.size===1?[...selList][0]:null;
+  $('qremove').hidden=!(one&&listSets[one]&&[...queue].some(id=>listSets[one].has(id)));   /* "remove from this list" only while viewing one list */
 }
-function openPick(id){pickId=id;$('lspicknew').value='';renderPick();$('lspick').showModal()}
-$('lspicklist').onchange=async e=>{
-  const c=e.target.closest('[data-pl]');if(!c)return;
-  const lid=c.dataset.pl;
+function renderQ(){
+  $('qinfo').textContent=queue.size+' pola in queue';
+  $('qlists').innerHTML=myLists.map(l=>`<button class="qb" data-ql="${l.id}">${esc(l.name)}<small>${(listSets[l.id]||new Set()).size} pola</small></button>`).join('')||'<p class="qempty">you have no lists yet.</p>';
+}
+function openQ(){if(!queue.size)return;$('qnewname').value='';renderQ();$('qdlg').showModal()}
+async function addToList(lid){
+  const ids=[...queue],l=myLists.find(x=>x.id===lid);
   try{
-    if(c.checked){await sbReq('/rest/v1/list_items',{method:'POST',body:{list_id:lid,item_id:pickId},prefer:'resolution=ignore-duplicates'});listSets[lid].add(pickId)}
-    else{await sbReq(`/rest/v1/list_items?list_id=eq.${lid}&item_id=eq.${encodeURIComponent(pickId)}`,{method:'DELETE'});listSets[lid].delete(pickId)}
-    renderLs();render();
-  }catch(err){c.checked=!c.checked;alert('Failed: '+err.message)}
+    await sbReq('/rest/v1/list_items',{method:'POST',body:ids.map(item_id=>({list_id:lid,item_id})),prefer:'resolution=ignore-duplicates'});
+    ids.forEach(id=>listSets[lid].add(id));
+    queue.clear();$('qdlg').close();render();renderLs();toast(`added ${ids.length} pola to “${l.name}”`);
+  }catch(err){alert('Failed: '+err.message)}
+}
+$('qadd').onclick=openQ;
+$('qclear').onclick=()=>{queue.clear();render()};
+$('qclose').onclick=()=>$('qdlg').close();
+$('qlists').onclick=e=>{const b=e.target.closest('[data-ql]');if(b)addToList(b.dataset.ql)};
+$('qnewbtn').onclick=async()=>{
+  try{const l=await createList($('qnewname').value);if(l){renderLs();await addToList(l.id)}}
+  catch(err){alert('Failed: '+err.message)}
 };
-$('lspickadd').onclick=async()=>{
+$('qremove').onclick=async()=>{
+  const lid=[...selList][0];if(!lid)return;
+  const ids=[...queue].filter(id=>listSets[lid]&&listSets[lid].has(id)),l=myLists.find(x=>x.id===lid);
+  if(!ids.length||!confirm(`Remove ${ids.length} pola from “${l.name}”?`))return;
   try{
-    const l=await createList($('lspicknew').value);if(!l)return;
-    await sbReq('/rest/v1/list_items',{method:'POST',body:{list_id:l.id,item_id:pickId},prefer:'resolution=ignore-duplicates'});
-    listSets[l.id].add(pickId);$('lspicknew').value='';renderPick();renderLs();render();
+    await sbReq(`/rest/v1/list_items?list_id=eq.${lid}&item_id=in.(${ids.map(encodeURIComponent).join(',')})`,{method:'DELETE'});
+    ids.forEach(id=>{listSets[lid].delete(id);queue.delete(id)});
+    render();renderLs();toast(`removed ${ids.length} pola from “${l.name}”`);
   }catch(err){alert('Failed: '+err.message)}
 };
-$('lspickclose').onclick=()=>$('lspick').close();
-if(sbOn()&&sess)afterLogin().catch(()=>{});
+
+/* open a list from a link: .../idntt-pola/#@username/list-name (works without logging in) */
+function curHash(){
+  if(!hashDone)return location.hash;
+  if(shared)return '#@'+shared.user+'/'+slug(shared.name);
+  if(sess&&selList.size===1){const l=myLists.find(x=>x.id===[...selList][0]);if(l)return '#@'+uName()+'/'+slug(l.name)}
+  return '';
+}
+function updViewbar(){
+  const t=shared?`viewing @${shared.user}'s list “${shared.name}”`:viewMsgText;
+  $('viewbar').hidden=!t;$('viewtxt').textContent=t;
+}
+$('viewclear').onclick=()=>{shared=null;viewMsgText='';go()};
+async function applyHash(){
+  let m=null;try{m=/^#@([a-z0-9_]{3,20})\/(.+)$/.exec(decodeURIComponent(routeHash||''))}catch(e){}
+  if(!m||!sbOn()){hashDone=true;return}
+  const user=m[1],sg=m[2];
+  try{
+    if(sess&&uName()===user){
+      const l=myLists.find(x=>slug(x.name)===sg);
+      if(l){selList.add(l.id);MSR.forEach(f=>f());hashDone=true;go();return}
+    }
+    const ls=await sbReq(`/rest/v1/lists?select=id,name&owner_name=eq.${encodeURIComponent(user)}&order=created_at.asc`,{auth:false});
+    const l=ls.find(x=>slug(x.name)===sg);
+    if(!l)viewMsgText='this list was not found, or it is private';
+    else{
+      const rows=await sbAll(`/rest/v1/list_items?select=item_id&list_id=eq.${l.id}&order=item_id.asc`,false);
+      shared={user,name:l.name,ids:new Set(rows.map(x=>x.item_id))};
+    }
+  }catch(e){viewMsgText='could not open this list'}
+  hashDone=true;go();
+}
+(async()=>{
+  if(sbOn()&&sess){try{await afterLogin()}catch(e){}}
+  await applyHash();
+})();
+
 
 /* about: text and extra buttons in the About window, editable by the admin (saved in data/about.json) */
 const ABOUT_DEFAULT={title:'About',
@@ -1169,7 +1077,7 @@ function syncUrl(){
   if($('q').value.trim())p.set('q',$('q').value.trim());
   if(range){p.set('date',range.a+(range.b?'_'+range.b:''));if(ext)p.set('ext','1')}
   const qs=p.toString().replace(/%2C/gi,',');
-  try{history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+location.hash)}catch(e){}
+  try{history.replaceState(null,'',location.pathname+(qs?'?'+qs:'')+curHash())}catch(e){}
 }
 async function load(){
   try{
