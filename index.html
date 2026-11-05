@@ -217,7 +217,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
     <button id="lsbtn" class="sm pri">Lists</button>
     <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
     <button id="about" class="sm pri">About</button>
-    <button id="sibtn" class="sm pri">sign in</button>
+    <button id="sibtn" class="sm pri">Sign in</button>
   </div>
 </header>
 <main>
@@ -246,8 +246,8 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
   </div>
   <div id="viewbar" hidden><span id="viewtxt"></span><button class="sm" id="viewclear">clear</button></div>
   <div id="viewhead" hidden></div>
-  <div id="lockview" hidden><div class="lockic">🔒</div><p id="lockmsg"></p></div>
   <div class="cnt" id="cnt"></div>
+  <div id="lockview" hidden><div class="lockic">🔒</div><p id="lockmsg"></p></div>
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" hidden>No pola yet.</div>
   <div style="text-align:center;margin-top:14px"><button class="sm" id="more" hidden>Show more</button></div>
@@ -918,7 +918,7 @@ function tileHtml(l,fns){
 function renderLs(){
   const on=!!sess;
   $('lsauth').hidden=on;$('lsmain').hidden=!on;
-  $('sibtn').textContent=on?uName():'sign in';
+  $('sibtn').textContent=on?uName():'Sign in';
   if(!on)return;
   $('lshi').textContent=uName();
   $('lsinfo').textContent=myLists.length+(myLists.length===1?' available list':' available lists');
@@ -1101,6 +1101,14 @@ $('absave').onclick=async()=>{
   catch(e){alert('Failed: '+e.message)}
   finally{$('absave').disabled=false}
 };
+/* click on the dark area outside a window to close it */
+document.querySelectorAll('dialog').forEach(d=>{
+  if(d.id==='dlg')return;
+  let down=false;
+  const outside=e=>{const r=d.getBoundingClientRect();return e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom};
+  d.addEventListener('mousedown',e=>{down=e.target===d&&outside(e)});     /* press AND release outside, so selecting text never closes it */
+  d.addEventListener('click',e=>{if(down&&e.target===d&&outside(e))d.close();down=false});
+});
 /* sort / filter state lives in the address, e.g. .../idntt-pola/?type=group-vce&sort=first-member */
 let urlReady=false;
 const slug=v=>norm(String(v)).replace(/[^a-z0-9.]+/g,'-').replace(/^-+|-+$/g,'');
