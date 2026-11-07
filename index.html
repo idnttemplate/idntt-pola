@@ -392,7 +392,7 @@ const $=id=>document.getElementById(id);
 const CFG={owner:'',repo:'',branch:'main'};
 if(!CFG.owner&&location.hostname.endsWith('.github.io')){CFG.owner=location.hostname.split('.')[0];CFG.repo=location.pathname.split('/')[1]||CFG.owner+'.github.io'}
 const SHOPS=[];   /* optional seed shops (shops used in images are added automatically) */
-const NAMES=['dohun','heeju','sunjae','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','','',''];   /* index 0 = id1 */
+const NAMES=['dohun','heeju','sunjae','taein','jaeyoung','juho','jiwoon','hwanhee','cheongmyeong','towa','kyuhyuk','nuri','seongjun','yejoon','gyeongbeen','eunsoo','giwoong','jooheon','gyungho','eunchan','eunsung','dohyung','','jihoo'];   /* index 0 = id1 */
 const ERAS=['uneverm8t','yesw8are','itsnot5ver','find id'];
 const ERA_COLORS={uneverm8t:'#ff6700',yesw8are:'#1ab017',itsnot5ver:'#2076f2','find id':'#B6E9FF'};   /* colour of the era line on every card */
 const ROUNDS=['Album Inclusion','Broadcast','Cafe','Concert/Fan-con/Fan-meeting','Luckydraw','POB','Showcase',...Array.from({length:17},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
@@ -410,7 +410,7 @@ const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,
 /* search keywords that mean the same thing */
 const ALIAS=[[/\b(fan\s*sign|fansign|fs|offline(?!\s*events))\b/g,'f2f'],[/\b(video\s*call|video|fan\s*call|fancall|fc)\b/g,'vce'],[/\bld\b/g,'luckydraw'],[/\bpre[\s-]?order\b/g,'pob']];
 /* abbreviations typed as a whole word */
-const TOKMAP={jp:'jumpup',am:'apple music',cs:'counting stars',el:'everline',hl:'hellolive',kp2g:'kpoptogether',kptg:'kpoptogether',sw:'soundwave',rs:'rising star',wf:'whosfan',wsf:'whosfan',msg:'mystargoods','20':'[20]',pc:'postcard',bc:'broadcast',gongbang:'broadcast',sc:'showcase'};
+const TOKMAP={unevermet:'uneverm8t',unm:'uneverm8t',ywa:'yesw8are',yesweare:'yesw8are',ino:'itsnot5ver',itsnotover:'itsnot5ver',jp:'jumpup',am:'apple music',cs:'counting stars',el:'everline',hl:'hellolive',kp2g:'kpoptogether',kptg:'kpoptogether',sw:'soundwave',rs:'rising star',wf:'whosfan',wsf:'whosfan',msg:'mystargoods','20':'[20]',pc:'postcard',bc:'broadcast',gongbang:'broadcast',sc:'showcase'};
 const alias=q=>ALIAS.reduce((t,[re,to])=>t.replace(re,to),q);
 const esc=s=>(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const fmt=d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'No date';
