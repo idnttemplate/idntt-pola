@@ -187,6 +187,13 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 .qinp span{font-size:20px;font-weight:700;color:var(--tx)}
 .qinp input{flex:1;min-width:0;border:0;background:none;padding:12px 0;outline:0}
 .qnew button,#lsadd{flex:0 0 auto;background:var(--ac);color:#fff;border:0;border-radius:10px;padding:0 24px;font-weight:700;font-size:15px}
+#uidlg{width:min(780px,94vw);max-height:92vh;overflow:auto}
+.uirow{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd)}
+.uiimgs{display:flex;flex-direction:column;gap:6px;flex:none}
+.uiimgs img{width:88px;height:118px;object-fit:contain;border:1px solid var(--bd);border-radius:8px;background:var(--ac2)}
+.uimid{flex:1;min-width:0}
+.uimid select{width:100%}
+.uimid .mg{max-height:100px}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -237,11 +244,12 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
   </div>
   <div id="bulk" class="adm" hidden>
     <b id="bkn"></b>
-    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option><option value="desc">Description</option><option value="image">Image</option></select>
+    <select id="bkfield"><option value="shop">Shop</option><option value="mem">Members</option><option value="era">Era</option><option value="round">Round</option><option value="type">Type</option><option value="date">Date</option><option value="set">Set</option><option value="desc">Description</option><option value="image">Image type</option></select>
     <span id="bkval"></span>
     <button class="pri sm" id="bkapply">Apply to selected</button>
     <button class="sm" id="bkall">Select all shown results</button>
     <button class="sm" id="bkclr">Clear selection</button>
+    <button class="sm" id="bkimg" title="replace the picture of the selected pola">update image</button><input type="file" id="bkimgf" accept="image/*" multiple hidden>
     <button class="sm" id="bkdel" style="color:#fff;background:var(--danger);border-color:var(--danger)">Delete selected</button>
   </div>
   <div id="viewbar" hidden><span id="viewtxt"></span><button class="sm" id="viewclear">clear</button></div>
@@ -352,6 +360,14 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
   </div>
 </dialog>
 
+<dialog id="uidlg">
+  <h3 style="margin:0 0 6px">update images</h3>
+  <p class="cnt">for every new image, check which pola it replaces and set its member(s). everything else (shop, round, era, type, date, set, description) stays the same, and previews become real images.</p>
+  <div id="uirows"></div>
+  <div class="cnt" id="uiprog"></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="uicancel">Cancel</button><button class="pri" id="uiapply">Update images</button></div>
+</dialog>
+
 <dialog id="dlg">
   <h3 id="dt" style="margin:0 0 4px">Add image</h3>
   <div id="filerow"><label>Images (up to 100 per save)</label><input type="file" id="file" accept="image/*" multiple><div id="prog" class="cnt"></div></div>
@@ -363,7 +379,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
   <label>Types (tick one or more, none = unsorted)</label><div id="ftypew"></div>
   <label>Date</label><input type="date" id="fdate" min="2025-08-01">
   <label>Set (admin only, optional: 1, 2, 3…)</label><input type="number" id="fset" min="1" placeholder="e.g. 1">
-  <label>Image (real image / preview)</label><select id="fimage"><option value="">—</option><option value="real image">real image</option><option value="preview">preview</option></select>
+  <label>Image type (real image / preview)</label><select id="fimage"><option value="">—</option><option value="real image">real image</option><option value="preview">preview</option></select>
   <label>Description (admin only, optional)</label><input id="fdesc" maxlength="120" placeholder="shown after the title, e.g. event or cafe name">
   <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
     <button id="cancel">Cancel</button><button class="pri" id="save">Save</button>
@@ -418,6 +434,7 @@ const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+Strin
 const addD=(s,n)=>{const x=new Date(s+'T00:00');x.setDate(x.getDate()+n);return ds(x)};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const memN=n=>n&&NAMES[n-1]?NAMES[n-1]:'';
+const vq=i=>i&&i.v?'?v='+i.v:'';   /* changes when the picture of a pola is replaced, so browsers load the new one */
 /* items support several members (mems). Old items with a single "mem" are converted automatically. */
 const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const t=Array.isArray(i.types)?i.types:(i.type?[i.type]:[]);const o={...i,mems:[...new Set(m.map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b),types:TYPES.filter(x=>t.includes(x))};delete o.mem;delete o.type;return o};   /* an objekt can have several types; old single "type" is converted */
 const mm=i=>i.mems||[];
@@ -538,7 +555,7 @@ function render(){
   lastList=list;
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
-  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="lb${queue.has(i.id)?' on':''}" data-lb="${i.id}" title="add to the queue">${queue.has(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg" data-v="${i.id}" alt="" loading="lazy"><div class="i">
+  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="lb${queue.has(i.id)?' on':''}" data-lb="${i.id}" title="add to the queue">${queue.has(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg${vq(i)}" data-v="${i.id}" alt="" loading="lazy"><div class="i">
    <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="era" style="color:${ERA_COLORS[i.era]||'var(--mut)'}">${esc(i.era)||'&nbsp;'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
@@ -730,9 +747,66 @@ $('bkdel').onclick=async()=>{
   finally{$('bkdel').disabled=false}
 };
 
+/* update image: replace the picture of the selected pola (admin) */
+function selectedPola(){return [...lastList.filter(i=>picked.has(i.id)),...items.filter(i=>picked.has(i.id)&&!lastList.includes(i))]}
+async function doImgUpdate(pairs){
+  const add=[],upd={},v=Date.now();let n=0;
+  for(const p of pairs){
+    $('uiprog').textContent=`Preparing ${++n}/${pairs.length}…`;
+    const [full,th]=await Promise.all([shrink(p.file,1400,.85),shrink(p.file,360,.8)]);
+    add.push({path:`img/${p.old}.jpg`,blob:full},{path:`th/${p.old}.jpg`,blob:th});
+    upd[p.old]={mems:p.mems,v};
+  }
+  /* only the picture (and for 2+ images the member) changes; a preview becomes a real image */
+  await commit(pairs.length>1?`Update ${pairs.length} images`:'Update image',{add,mutate:a=>chk(a.map(i=>{
+    const u=upd[i.id];if(!u)return i;
+    return {...i,...(u.mems?{mems:u.mems}:{}),v:u.v,image:i.image==='preview'?'real image':i.image};
+  }))});
+}
+let uiState=null;
+function startImgUpdate(files){
+  if(!admin||!picked.size||!files.length)return;
+  const sel=selectedPola();
+  if(files.length!==sel.length){alert(`You selected ${sel.length} pola, so please choose exactly ${sel.length} image${sel.length===1?'':'s'} (you chose ${files.length}).`);return}
+  if(sel.length===1){
+    if(!confirm('Replace the picture of this pola? Everything else stays the same (a preview becomes a real image).'))return;
+    toast('updating the image…');
+    doImgUpdate([{old:sel[0].id,file:files[0],mems:null}]).then(()=>{picked.clear();render();alert(DONE)}).catch(e=>alert('Failed: '+e.message));
+    return;
+  }
+  /* 2+ images: pair each new image with a selected pola and ask for the member(s) again */
+  uiState={sel,files,urls:files.map(f=>URL.createObjectURL(f))};
+  const opts=sel.map(i=>`<option value="${i.id}">${esc(titleOf(i))||'—'} · ${esc(memTxt(i)||'no member')} · ${fmt(i.date)}</option>`).join('');
+  const ib=admin?RAW:'';
+  $('uirows').innerHTML=files.map((f,k)=>`<div class="uirow"><div class="uiimgs"><img src="${uiState.urls[k]}" alt="new"><img class="uiold" src="${ib}th/${sel[k].id}.jpg${vq(sel[k])}" alt="old"></div><div class="uimid"><label>new image ${k+1}: replaces</label><select class="uisel">${opts.replace(`value="${sel[k].id}"`,`value="${sel[k].id}" selected`)}</select><label>member(s) of the new image</label>${memGrid([])}</div></div>`).join('');
+  $('uiprog').textContent='';$('uidlg').showModal();
+}
+$('uirows').onchange=e=>{
+  const sl=e.target.closest('.uisel');if(!sl)return;
+  const old=sl.closest('.uirow').querySelector('.uiold');
+  old.src=(admin?RAW:'')+'th/'+sl.value+'.jpg'+vq(items.find(i=>i.id===sl.value));
+};
+$('uicancel').onclick=()=>$('uidlg').close();
+$('uiapply').onclick=async()=>{
+  if(!admin||!uiState)return;
+  const rows=[...$('uirows').querySelectorAll('.uirow')],pairs=[],used=new Set();
+  for(let k=0;k<rows.length;k++){
+    const old=rows[k].querySelector('.uisel').value,mems=gridVals(rows[k].querySelector('.mg'));
+    if(used.has(old)){alert('Two new images replace the same pola. Please give each image a different pola.');return}
+    if(!mems.length){alert(`Please choose the member(s) of new image ${k+1}.`);return}
+    used.add(old);pairs.push({old,file:uiState.files[k],mems});
+  }
+  $('uiapply').disabled=true;
+  try{await doImgUpdate(pairs);uiState.urls.forEach(u=>URL.revokeObjectURL(u));uiState=null;$('uidlg').close();picked.clear();render();alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('uiapply').disabled=false}
+};
+$('bkimg').onclick=()=>{if(!picked.size)return;$('bkimgf').value='';$('bkimgf').click()};
+$('bkimgf').onchange=e=>startImgUpdate([...e.target.files]);
+
 /* detail view */
 function openView(it){
-  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg';$('vmem').textContent=memTxt(it)||'—';
+  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg'+vq(it);$('vmem').textContent=memTxt(it)||'—';
   $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=(it.types||[]).join(' + ')||'—';$('vdate').textContent=fmt(it.date);
   $('view').scrollTop=0;$('view').showModal();
 }
@@ -910,7 +984,7 @@ function tileHtml(l,fns){
   const have=new Set(items.map(i=>i.id));
   const ids=[...(listSets[l.id]||[])].filter(id=>have.has(id));
   const pick=ids.length?ids[Math.floor(Math.random()*ids.length)]:null;
-  const tile=`<button class="qt" ${fns?'data-lv':'data-ql'}="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${admin?RAW:''}th/${pick}.jpg" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}${fns?` <span class="qc">(${ids.length})</span>`:''}</div></button>`;
+  const tile=`<button class="qt" ${fns?'data-lv':'data-ql'}="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${admin?RAW:''}th/${pick}.jpg${vq(items.find(x=>x.id===pick))}" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}${fns?` <span class="qc">(${ids.length})</span>`:''}</div></button>`;
   if(!fns)return tile;
   const pub=l.is_public!==false;
   return `<div class="qcol">${tile}<div class="qfns"><button class="qfn" data-lp="${l.id}" title="${pub?'public: anyone with the link can view it. click to make it private':'private: only you can open it. click to make it public'}">${pub?'🌐':'🔒'}</button><button class="qfn" data-lc="${l.id}" title="copy the link of this list">🔗</button><button class="qfn" data-lr="${l.id}" title="rename">✎</button><button class="qfn" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div></div>`;
