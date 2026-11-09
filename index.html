@@ -115,6 +115,18 @@ body.admin .ptag{left:36px}   /* leave room for the admin select box */
 #bulk select,#bulk input{height:36px;padding:0 10px;font-size:14px}
 .xl{color:var(--act);text-decoration:underline;text-underline-offset:2px;font-weight:700}
 .signd label{color:rgba(255,255,255,.85)}
+.hbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.hbtns button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:700px){
+  header{padding:14px 14px 6px;flex-direction:column;align-items:stretch;gap:10px}
+  .brand{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:12px;row-gap:6px}   /* logo next to the title only, the description sits flush left under them */
+  .brand h1{display:contents}
+  .brand .ttl{font-size:24px;line-height:1.15;font-weight:700;color:var(--h1);grid-row:1}
+  .brand .logo{width:46px;height:46px;grid-row:1}
+  .brand h1 small{grid-column:1/-1;font-size:12px;line-height:1.35}
+  .hbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}   /* 5 buttons in 2 rows */
+  .hbtns button{font-size:12.5px;padding:6px 4px}
+}
 .brand{display:flex;align-items:center;gap:14px;min-width:0}
 .logo{width:56px;height:56px;border-radius:12px;object-fit:cover;flex:none}
 a.hb{display:inline-block;text-decoration:none;font-size:13px;padding:5px 9px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff;font-weight:700}
@@ -217,11 +229,10 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 </style></head><body>
 
 <header>
-  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1>idntt pola tracker<small>all idntt pola and physical items archieved in one place</small><small>made by <a class="xl" href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a></small></h1></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+  <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1><span class="ttl">idntt pola tracker</span><small>all idntt pola and physical items archieved in one place</small><small>made by <a class="xl" href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a></small></h1></div>
+  <div class="hbtns">
     <button id="notes" class="sm holo">Notes</button>
     <button id="evbtn" class="sm holo">Events</button>
-    <button id="lsbtn" class="sm pri">Lists</button>
     <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
     <button id="about" class="sm pri">About</button>
     <button id="sibtn" class="sm pri">Sign in</button>
@@ -234,6 +245,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
       <button id="calbtn">📅 Date</button>
       <div id="cal" hidden=""></div>
     </div>
+    <button class="pri" id="lsbtn">Lists</button>
     <button class="pri adm" id="add">＋ Add image</button>
   </div>
   <div class="sortbar">
@@ -272,7 +284,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 <button id="totop" hidden title="Back to top">↑</button>
 
 <dialog id="evdlg">
-  <div class="evhead"><div><h3 style="margin:0">Events</h3><div class="cnt" id="evkst"></div></div>
+  <div class="evhead"><div><h3 style="margin:0">Events</h3><div class="cnt" id="evkst"></div><div class="cnt" id="evnote" style="margin-top:4px">notes: events only include rounds from the current era that haven't been updated to the website yet!</div></div>
     <div style="display:flex;gap:8px"><button class="pri sm adm" id="evaddbtn">＋ Add event</button><button class="sm" id="evclose">✕</button></div></div>
   <div id="evdelbar" hidden><b>delete event(s)?</b><span id="evdn"></span><button id="evdel">Delete</button><button id="evdelcancel">Cancel</button></div>
   <div id="evlist"></div>
