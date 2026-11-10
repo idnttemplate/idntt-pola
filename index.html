@@ -115,6 +115,15 @@ body.admin .ptag{left:36px}   /* leave room for the admin select box */
 #bulk select,#bulk input{height:36px;padding:0 10px;font-size:14px}
 .xl{color:var(--act);text-decoration:underline;text-underline-offset:2px;font-weight:700}
 .signd label{color:rgba(255,255,255,.85)}
+.bar #lsbtn,body.admin .bar #add{min-width:130px}   /* Lists is about as wide as Add image (computer) */
+@media (max-width:700px){
+  .bar{flex-wrap:nowrap;gap:6px}                                  /* search + Date + Lists on one line */
+  .bar input[type=search]{flex:1 1 0;min-width:0}
+  .bar .calwrap,.bar #lsbtn{flex:0 0 78px;min-width:0}            /* Lists is as wide as Date */
+  .bar #calbtn,.bar #lsbtn{width:100%;padding:9px 4px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  body.admin .bar{flex-wrap:wrap}
+  body.admin .bar #add{flex:1 1 100%}
+}
 .hbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 .hbtns button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 @media (max-width:700px){
@@ -575,7 +584,7 @@ function render(){
   $('cnt').textContent=`${list.length} pola found!`;
   $('unsorted').textContent='Unsorted ('+items.filter(isUnsorted).length+')';$('unsorted').classList.toggle('on',unsortedOnly);
   $('calbtn').textContent='📅 '+(range?(range.b&&range.b!==range.a?fmt(range.a<range.b?range.a:range.b)+' → '+fmt(range.a<range.b?range.b:range.a):fmt(range.a))+(ext?' ±2d':''):'Date');
-  $('calbtn').classList.toggle('on',!!range);
+  $('calbtn').title=$('calbtn').textContent;$('calbtn').classList.toggle('on',!!range);
   updBulk();updQueue();updViewbar();syncUrl();
 }
 const go=()=>{shown=PAGE;render()};
