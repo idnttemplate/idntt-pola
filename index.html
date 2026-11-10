@@ -128,11 +128,11 @@ body.admin .ptag{left:36px}   /* leave room for the admin select box */
 .hbtns button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 @media (max-width:700px){
   header{padding:14px 14px 6px;flex-direction:column;align-items:stretch;gap:10px}
-  .brand{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:12px;row-gap:6px}   /* logo next to the title only, the description sits flush left under them */
-  .brand h1{display:contents}
-  .brand .ttl{font-size:24px;line-height:1.15;font-weight:700;color:var(--h1);grid-row:1}
-  .brand .logo{width:46px;height:46px;grid-row:1}
-  .brand h1 small{grid-column:1/-1;font-size:12px;line-height:1.35}
+  header .brand{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:12px;row-gap:6px}   /* logo next to the title only, the description sits flush left under them */
+  header .brand h1{display:contents}
+  header .brand .ttl{font-size:22px;line-height:1.15;font-weight:700;color:var(--h1);grid-row:1}
+  header .brand .logo{width:46px;height:46px;grid-row:1}
+  header .brand h1 small{grid-column:1/-1;font-size:12px;line-height:1.35}
   .hbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}   /* 5 buttons in 2 rows */
   .hbtns button{font-size:12.5px;padding:6px 4px}
 }
