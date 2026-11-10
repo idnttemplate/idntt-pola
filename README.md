@@ -11,11 +11,6 @@ idntt pola tracker is a fanmade site only without any relevance to MODHAUS' COSM
 **General Disclaimer**
 - This website is a non-profit fan project created for archiving and collecting purposes only.
 - All original photos, and images belong to **MODHAUS** and the owners/sellers of the images only
-  
-**AI Assistance Disclaimer:**
-- **AI** (such as Gemini/Claude) are used for codes, UI optimization and writing project documentation only.
-- Data and media details (such as images and descriptions) are manually updated to ensure accuracy.
-- **No members' images or official media assets were fed into, trained on, or processed by Generative AI models.**
 
 ## 3. Tech Stack:
 * **Frontend:** HTML5, CSS3, JavaScript (Vanilla JS)
