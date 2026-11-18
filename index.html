@@ -215,6 +215,21 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 .uimid{flex:1;min-width:0}
 .uimid select{width:100%}
 .uimid .mg{max-height:100px}
+#prdlg{width:min(780px,94vw);height:82vh;padding:16px;border-radius:20px}
+#prdlg[open]{display:flex;flex-direction:column}
+#prlist{flex:1;overflow:auto;padding:12px 6px 20px;display:flex;flex-direction:column;gap:22px}
+.prc{position:relative;border:3px solid var(--cb);border-radius:14px;padding:16px 18px 14px;background:var(--card)}
+.prname{font-size:22px;font-weight:700;text-align:center;margin:2px 28px 12px}
+.prbar{display:flex;height:34px;border:2px solid var(--cb);border-radius:8px;overflow:hidden;background:var(--ac2)}
+.prbar span{display:block;height:100%}
+.pr1{background:#011f4b}.pr2{background:#005b96}.pr3{background:#b3cde0}   /* same three colours as the event cards */
+.prlab{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;text-align:center}
+.prlab b{display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px}
+.prlab i{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid var(--cb)}
+.prlab span{display:block;font-size:20px;font-weight:700;margin-top:2px}
+.prtot{text-align:right;margin-top:8px;font-weight:700}
+.prred{position:absolute;top:10px;right:10px;width:26px;height:26px;padding:0;background:#e53935;border:2px solid #fff;border-radius:4px;color:#fff;font-size:13px;line-height:1;cursor:pointer}
+@media (max-width:600px){.prname{font-size:19px}.prlab span{font-size:17px}.prlab b{font-size:12.5px}}
 .ms{position:relative}
 .msb{max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;padding:9px 12px}
 .msb.on{border-color:var(--ac);background:var(--ac2)}
@@ -240,6 +255,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 <header>
   <div class="brand"><img class="logo" src="logo.jpg" alt="" onerror="this.style.display='none'"><h1><span class="ttl">idntt pola tracker</span><small>all idntt pola and physical items archieved in one place</small><small>made by <a class="xl" href="https://x.com/idnttemplate" target="_blank" rel="noopener">@idnttemplate</a></small></h1></div>
   <div class="hbtns">
+    <button id="prbtn" class="sm pri">Progress</button>
     <button id="notes" class="sm holo">Notes</button>
     <button id="evbtn" class="sm holo">Events</button>
     <button id="theme" class="sm pri" title="Switch theme">🌙 Dark</button>
@@ -291,6 +307,23 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 </dialog>
 
 <button id="totop" hidden title="Back to top">↑</button>
+
+<dialog id="prdlg">
+  <div class="evhead"><div><h3 style="margin:0">Progress check</h3><div class="cnt" style="margin-top:4px">check the web updating with new rounds</div></div>
+    <div style="display:flex;gap:8px"><button class="pri sm adm" id="praddbtn">＋ Add era</button><button class="sm" id="prclose">✕</button></div></div>
+  <div id="prlist"></div>
+</dialog>
+
+<dialog id="predlg">
+  <h3 id="predtitle" style="margin:0 0 6px">add an era</h3>
+  <label>Era name</label><input id="prname" maxlength="40" placeholder="e.g. find id" autocomplete="off">
+  <label>Colour of the name</label><input id="prcolor" type="color" value="#2076f2" style="height:40px;padding:2px">
+  <label>Added (already on the website)</label><input id="pradded" type="number" min="0" step="1">
+  <label>Missing (not uploaded yet)</label><input id="prmiss" type="number" min="0" step="1">
+  <label>Unreleased (not released yet)</label><input id="prunrel" type="number" min="0" step="1">
+  <div class="cnt" id="prtotal" style="margin-top:8px">total: 0</div>
+  <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px"><button id="prdelete" style="color:var(--danger)">Delete era</button><span style="display:flex;gap:8px"><button id="prcancel">Cancel</button><button class="pri" id="prsave">Save</button></span></div>
+</dialog>
 
 <dialog id="evdlg">
   <div class="evhead"><div><h3 style="margin:0">Events</h3><div class="cnt" id="evkst"></div><div class="cnt" id="evnote" style="margin-top:4px">notes: events only include rounds from the current era that haven't been updated to the website yet!</div></div>
@@ -664,7 +697,7 @@ async function rawItems(){return (await rawGet('items.json')).map(fixI)}
 const toB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result.split(',')[1]);f.readAsDataURL(b)});
 const setProg=t=>$('prog').textContent=t;
 /* one atomic commit: upload files (add), remove files (del), rewrite data/items.json (mutate) */
-async function commit(msg,{add=[],del=[],mutate,ev,nt,ab}){
+async function commit(msg,{add=[],del=[],mutate,ev,nt,ab,pr}){
   const head=(await gh('/git/ref/heads/'+CFG.branch)).object.sha;
   const base=(await gh('/git/commits/'+head)).tree.sha;
   const next=mutate?mutate(await rawItems()):null;
@@ -681,6 +714,7 @@ async function commit(msg,{add=[],del=[],mutate,ev,nt,ab}){
   if(evNext)tree.push({path:'data/events.json',mode:'100644',type:'blob',content:JSON.stringify(evNext)});
   if(nt)tree.push({path:'data/notes.json',mode:'100644',type:'blob',content:JSON.stringify(nt)});
   if(ab)tree.push({path:'data/about.json',mode:'100644',type:'blob',content:JSON.stringify(ab)});
+  if(pr)tree.push({path:'data/progress.json',mode:'100644',type:'blob',content:JSON.stringify(pr)});
   const t=await gh('/git/trees',{base_tree:base,tree});
   const c=await gh('/git/commits',{message:msg,tree:t.sha,parents:[head]});
   await gh('/git/refs/heads/'+CFG.branch,{sha:c.sha},'PATCH');
@@ -1198,12 +1232,56 @@ $('absave').onclick=async()=>{
 };
 /* click on the dark area outside a window to close it */
 document.querySelectorAll('dialog').forEach(d=>{
-  if(d.id==='dlg')return;
+  if(d.id==='dlg'||d.id==='predlg')return;
   let down=false;
   const outside=e=>{const r=d.getBoundingClientRect();return e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom};
   d.addEventListener('mousedown',e=>{down=e.target===d&&outside(e)});     /* press AND release outside, so selecting text never closes it */
   d.addEventListener('click',e=>{if(down&&e.target===d&&outside(e))d.close();down=false});
 });
+/* progress: how many pola of every era are already on the website. The numbers are typed by the admin (data/progress.json) */
+const PR_DEFAULT=ERAS.map(n=>({id:n,name:n,color:ERA_COLORS[n]||'#2076f2',added:0,missing:0,unreleased:0}));
+let progress=PR_DEFAULT,prEdit=null;
+const fixPr=p=>({id:String(p.id||p.name||uid()),name:String(p.name||''),color:/^#[0-9a-f]{6}$/i.test(p.color||'')?p.color:'#2076f2',added:Math.max(0,Math.floor(+p.added||0)),missing:Math.max(0,Math.floor(+p.missing||0)),unreleased:Math.max(0,Math.floor(+p.unreleased||0))});
+function renderPr(){
+  $('prlist').innerHTML=progress.map(e=>{
+    const t=e.added+e.missing+e.unreleased;
+    const seg=(k,n)=>e[k]?`<span class="pr${n}" style="width:${e[k]/t*100}%" title="${k}: ${e[k]}"></span>`:'';
+    return `<div class="prc"><button class="prred adm" data-pe="${esc(e.id)}" title="edit the numbers of this era">✎</button><div class="prname" style="color:${esc(e.color)}">${esc(e.name)}</div><div class="prbar">${seg('added',1)}${seg('missing',2)}${seg('unreleased',3)}</div><div class="prlab"><div><b><i class="pr1"></i>added</b><span>${e.added}</span></div><div><b><i class="pr2"></i>missing</b><span>${e.missing}</span></div><div><b><i class="pr3"></i>unreleased</b><span>${e.unreleased}</span></div></div><div class="prtot">total: ${t}</div></div>`;
+  }).join('')||'<p class="cnt" style="text-align:center">no era yet.</p>';
+}
+const prNum=id=>Math.max(0,Math.floor(+$(id).value||0));
+function prTotal(){$('prtotal').textContent='total: '+(prNum('pradded')+prNum('prmiss')+prNum('prunrel'))}
+function openPrEdit(id){
+  prEdit=id;const e=id?progress.find(x=>x.id===id):null;
+  $('predtitle').textContent=e?'edit '+e.name:'add an era';
+  $('prname').value=e?e.name:'';$('prcolor').value=e?e.color:'#2076f2';
+  $('pradded').value=e?e.added:0;$('prmiss').value=e?e.missing:0;$('prunrel').value=e?e.unreleased:0;
+  $('prdelete').hidden=!e;prTotal();$('predlg').showModal();
+}
+async function savePr(next){
+  $('prsave').disabled=true;
+  try{await commit('Edit progress',{pr:{eras:next}});progress=next;renderPr();$('predlg').close();alert(DONE)}
+  catch(e){alert('Failed: '+e.message)}
+  finally{$('prsave').disabled=false}
+}
+['pradded','prmiss','prunrel'].forEach(id=>$(id).addEventListener('input',prTotal));
+$('prbtn').onclick=()=>{renderPr();$('prdlg').showModal()};
+$('prclose').onclick=()=>$('prdlg').close();
+$('praddbtn').onclick=()=>{if(admin)openPrEdit(null)};
+$('prlist').onclick=e=>{const b=e.target.closest('[data-pe]');if(b&&admin)openPrEdit(b.dataset.pe)};
+$('prcancel').onclick=()=>$('predlg').close();
+$('prsave').onclick=()=>{
+  if(!admin)return;
+  const name=$('prname').value.trim();if(!name){alert('Please type the name of the era');return}
+  const e=fixPr({id:prEdit||uid(),name,color:$('prcolor').value,added:prNum('pradded'),missing:prNum('prmiss'),unreleased:prNum('prunrel')});
+  if(progress.some(x=>x.id!==e.id&&x.name.toLowerCase()===name.toLowerCase())){alert('This era already exists');return}
+  savePr(prEdit?progress.map(x=>x.id===prEdit?e:x):[...progress,e]);
+};
+$('prdelete').onclick=()=>{
+  if(!admin||!prEdit)return;
+  const e=progress.find(x=>x.id===prEdit);
+  if(confirm(`Delete the era "${e.name}"?`))savePr(progress.filter(x=>x.id!==prEdit));
+};
 /* sort / filter state lives in the address, e.g. .../idntt-pola/?type=group-vce&sort=first-member */
 let urlReady=false;
 const slug=v=>norm(String(v)).replace(/[^a-z0-9.]+/g,'-').replace(/^-+|-+$/g,'');
@@ -1260,7 +1338,13 @@ async function load(){
     else{const r=await fetch('data/about.json?'+Date.now(),{cache:'no-store'});n=r.ok?await r.json():null}
     about=n&&Array.isArray(n.lines)&&Array.isArray(n.links)?{title:n.title||'About',lines:n.lines.map(String),links:n.links.filter(l=>l&&l.label&&l.url)}:ABOUT_DEFAULT;
   }catch(e){about=ABOUT_DEFAULT}
-  renderNotes();renderAbout();
+  try{
+    let n;
+    if(admin)n=await rawGet('progress.json');
+    else{const r=await fetch('data/progress.json?'+Date.now(),{cache:'no-store'});n=r.ok?await r.json():null}
+    progress=n&&Array.isArray(n.eras)?n.eras.map(fixPr):PR_DEFAULT;
+  }catch(e){progress=PR_DEFAULT}
+  renderNotes();renderAbout();renderPr();
   if(!urlReady){applyUrl();urlReady=true}
   render();
   if($('evdlg').open)renderEv();
