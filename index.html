@@ -466,7 +466,7 @@ const NAMES=['dohun','heeju','sunjae','taein','jaeyoung','juho','jiwoon','hwanhe
 const ERAS=['uneverm8t','yesw8are','itsnot5ver','find id'];
 const ERA_COLORS={uneverm8t:'#ff6700',yesw8are:'#1ab017',itsnot5ver:'#2076f2','find id':'#B6E9FF'};   /* colour of the era line on every card */
 const ROUNDS=['Album Inclusion','Broadcast','Cafe','Concert/Fan-con/Fan-meeting','Luckydraw','POB','Showcase',...Array.from({length:19},(_,i)=>(i+1)+'.0'),'etc.'];   /* letters A-Z first, numbers after, etc. last */
-const TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events','f2f','group vce','1:1 vce','magazine','photobooth','event winner'];   /* items without a type count as "unsorted" */
+const TYPES=['album','pob','showcase','broadcast','f2f','3/4 cuts f2f','group vce','1:1 vce','cafe','event winner','luckydraw','magazine','meet&greet','offline events','photobooth'];   /* items without a type count as "unsorted" */
 const HIDE_TYPES=['album','pob','showcase','broadcast','luckydraw','cafe','offline events','photobooth'];   /* these types are not repeated in the card title */
 const NMEM=24,PAGE=120,MIN={y:2025,m:7};
 const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -497,7 +497,8 @@ const typeShow=i=>(i.types||[]).filter(t=>!HIDE_TYPES.includes(t)).join(' + '); 
 const hideRound=r=>r==='etc.'||/^concert/i.test(r||'');   /* these rounds are not written in the title */
 const titleOf=i=>(hideRound(i.round)?[i.shop,i.desc]:[i.shop,i.round,typeShow(i),i.desc]).filter(Boolean).join(' ');   /* shop + round + (type) + description */
 /* priority inside one date: album inclusion > pob > luckydraw > cafe > everything else */
-const kindOf=x=>{x=norm(x);if(x==='album'||x==='album inclusion')return 0;const k=['pob','luckydraw','cafe'].indexOf(x);return k<0?9:k+1};
+const roundAsType={'album inclusion':'album','pob':'pob','showcase':'showcase','broadcast':'broadcast','luckydraw':'luckydraw','cafe':'cafe'};
+const kindOf=x=>{x=norm(x);const k=TYPES.indexOf(roundAsType[x]||x);return k<0?99:k};   /* priority = the order of TYPES (rounds like Album Inclusion / POB count as the same type) */
 const rank=i=>Math.min(kindOf(i.round),...(i.types||[]).map(kindOf));
 const isUnsorted=i=>!(i.shop&&mm(i).length&&i.round&&i.date&&i.era&&i.image);   /* shop/member/round/date/era/image (set and type not counted) */
 
@@ -512,7 +513,7 @@ $('theme').onclick=()=>{theme=theme==='dark'?'light':'dark';try{localStorage.set
 applyTheme();
 
 const listOpts=(a,f)=>`<option value="">${f}</option>`+a.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
-const typeGrid=(sel=[])=>`<div class="mg">${TYPES.map(t=>`<label><input type="checkbox" value="${t}" ${sel.includes(t)?'checked':''}> ${t}</label>`).join('')}</div>`;
+const typeGrid=(sel=[])=>`<div class="mg">${TYPES.map(t=>`<label><input type="checkbox" value="${esc(t)}" ${sel.includes(t)?'checked':''}> ${esc(t)}</label>`).join('')}</div>`;
 const gridStr=el=>[...el.querySelectorAll('input:checked')].map(c=>c.value);
 const memGrid=(sel=[])=>`<div class="mg">${Array.from({length:NMEM},(_,i)=>`<label><input type="checkbox" value="${i+1}" ${sel.includes(i+1)?'checked':''}> id${i+1}${memN(i+1)?' '+esc(memN(i+1)):''}</label>`).join('')}</div>`;
 const gridVals=el=>[...el.querySelectorAll('input:checked')].map(c=>+c.value);
