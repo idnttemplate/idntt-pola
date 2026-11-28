@@ -423,7 +423,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 </dialog>
 
 <dialog id="dlg">
-  <h3 id="dt" style="margin:0 0 4px">Add image</h3>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 id="dt" style="margin:0 0 4px">Add images</h3><button class="pri sm" id="modebtn" type="button">＋ Add previews</button></div>
   <div id="filerow"><label>Images (up to 100 per save)</label><input type="file" id="file" accept="image/*" multiple><div id="prog" class="cnt"></div></div>
   <label>Shop</label><input id="fshop" list="shops" placeholder="Shop name">
   <datalist id="shops"></datalist>
@@ -441,7 +441,7 @@ body:not(.user) .usr,body:not(.user) .card .lb{display:none!important}
 </dialog>
 
 <dialog id="view">
-  <div class="pic"><img id="vimg" alt=""></div>
+  <div class="pic"><img id="vimg" alt="" onerror="phErr(this)"></div>
   <div class="info">
     <button class="x sm" id="vx">✕</button>
     <div><div class="k">Member</div><div class="big" id="vmem"></div></div>
@@ -487,7 +487,14 @@ const fmt=d=>d?new Date(d+'T00:00').toLocaleDateString('en-GB',{day:'2-digit',mo
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 const addD=(s,n)=>{const x=new Date(s+'T00:00');x.setDate(x.getDate()+n);return ds(x)};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const thumbOf=i=>i.ph?phUrl(i.ph):`${admin?RAW:''}th/${i.id}.jpg${vq(i)}`;
+const fullOf=i=>i.ph?phUrl(i.ph):`${admin?RAW:''}img/${i.id}.jpg${vq(i)}`;
+const delPaths=ids=>ids.flatMap(id=>{const it=items.find(x=>x.id===id);return it&&it.ph?[]:[`img/${id}.jpg`,`th/${id}.jpg`]});   /* preview pola have no picture files to delete */
 const memN=n=>n&&NAMES[n-1]?NAMES[n-1]:'';
+/* preview pola: no picture is uploaded for them, they use the shared colour file preview/idN_preview.png (png, jpg, jpeg or webp) */
+const PH_EXT=['png','jpg','jpeg','webp'];
+const phUrl=(ph,k=0)=>(admin?RAW:'')+`preview/${ph}_preview.${PH_EXT[k]}`;
+function phErr(el){const ph=el.dataset.ph;if(!ph)return;const k=+(el.dataset.k||0)+1;if(k>=PH_EXT.length)return;el.dataset.k=k;el.src=phUrl(ph,k)}   /* try the next file type */
 const vq=i=>i&&i.v?'?v='+i.v:'';   /* changes when the picture of a pola is replaced, so browsers load the new one */
 /* items support several members (mems). Old items with a single "mem" are converted automatically. */
 const fixI=i=>{const m=Array.isArray(i.mems)?i.mems:(i.mem?[i.mem]:[]);const t=Array.isArray(i.types)?i.types:(i.type?[i.type]:[]);const o={...i,mems:[...new Set(m.map(Number).filter(n=>n>=1&&n<=NMEM))].sort((a,b)=>a-b),types:TYPES.filter(x=>t.includes(x))};delete o.mem;delete o.type;return o};   /* an objekt can have several types; old single "type" is converted */
@@ -610,7 +617,7 @@ function render(){
   lastList=list;
   for(const id of [...picked])if(!items.some(i=>i.id===id))picked.delete(id);
   $('s-date').value=sortD;
-  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="lb${queue.has(i.id)?' on':''}" data-lb="${i.id}" title="add to the queue">${queue.has(i.id)?'♥':'♡'}</button><img src="${ib}th/${i.id}.jpg${vq(i)}" data-v="${i.id}" alt="" loading="lazy"><div class="i">
+  $('grid').innerHTML=list.slice(0,shown).map(i=>`<div class="card">${admin?`<input type="checkbox" class="pick" data-p="${i.id}" ${picked.has(i.id)?'checked':''} title="Select">`:''}${i.image==='preview'?'<span class="ptag" title="preview">p</span>':''}<button class="lb${queue.has(i.id)?' on':''}" data-lb="${i.id}" title="add to the queue">${queue.has(i.id)?'♥':'♡'}</button><img src="${thumbOf(i)}" data-ph="${i.ph||''}" onerror="phErr(this)" data-v="${i.id}" alt="" loading="lazy"><div class="i">
    <div class="shop" title="${esc(titleOf(i))}">${esc(titleOf(i))||'—'}</div><div class="era" style="color:${ERA_COLORS[i.era]||'var(--mut)'}">${esc(i.era)||'&nbsp;'}</div><div class="mem" title="${esc(memTxt(i))}">${esc(memTxt(i))||'—'}</div>
    <div class="meta">${fmt(i.date)}${admin&&i.set?` · set ${i.set}`:''}</div>
    ${admin?`<div class="row"><button data-e="${i.id}" title="Edit">✎</button><button data-x="${i.id}" title="Delete" style="color:var(--danger)">🗑</button></div>`:''}</div></div>`).join('');
@@ -727,11 +734,24 @@ async function shrink(f,max,q){
   return new Promise(r=>c.toBlob(r,'image/jpeg',q));
 }
 const DONE='Saved! Visitors will see the change in about 1–2 minutes, after GitHub Pages redeploys.';
+let pvMode=false;
+function setMode(pv){
+  pvMode=pv;
+  $('dt').textContent=editId?'Edit':(pv?'Add previews':'Add images');
+  $('filerow').hidden=!!editId||pv;
+  $('modebtn').textContent=pv?'＋ Add images':'＋ Add previews';$('modebtn').hidden=!!editId;
+  if(!editId)$('fimage').value=pv?'preview':'real image';
+}
+$('modebtn').onclick=()=>setMode(!pvMode);
+async function missingPreviews(nums){      /* which colour files are not there (yet)? */
+  const test=n=>new Promise(res=>{let k=0;const im=new Image();im.onload=()=>res(true);im.onerror=()=>{k++;if(k>=PH_EXT.length)res(false);else im.src=phUrl('id'+n,k)};im.src=phUrl('id'+n,0)});
+  const out=[];for(const n of nums)if(!(await test(n)))out.push(n);return out;
+}
 function openDlg(it){
   if(!admin)return;
   editId=it?it.id:null;$('dt').textContent=it?'Edit':'Add images';$('filerow').hidden=!!it;
   $('fshop').value=it?.shop||'';$('fmemw').innerHTML=memGrid(it?mm(it):[]);$('fera').value=it?.era||'';$('fround').value=it?.round||'';$('ftypew').innerHTML=typeGrid(it?it.types||[]:[]);
-  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('fdesc').value=it?.desc||'';$('fimage').value=it?(it.image||''):'real image';$('file').value='';setProg('');
+  $('fdate').value=it?.date||ds(new Date());$('fset').value=it?.set||'';$('fdesc').value=it?.desc||'';$('fimage').value=it?(it.image||''):'real image';$('file').value='';setProg('');setMode(false);
   $('dlg').showModal();
 }
 $('save').onclick=async()=>{
@@ -740,6 +760,16 @@ $('save').onclick=async()=>{
   $('save').disabled=true;
   try{
     if(editId){setProg('Saving…');await commit('Edit pola',{mutate:a=>chk(a.map(i=>i.id===editId?{...i,...meta}:i))})}
+    else if(pvMode){
+      /* previews: one new pola for every ticked member, using the colour file of that member */
+      const nums=meta.mems;
+      if(!nums.length){alert('Tick at least one member: one preview is made for every member you tick.');return}
+      const miss=await missingPreviews(nums);
+      if(miss.length&&!confirm(`These colour files were not found:\n${miss.map(n=>`preview/id${n}_preview.png`).join('\n')}\n\nAdd the previews anyway? They show an empty picture until you upload the files.`))return;
+      const news=nums.map(n=>({id:uid(),...meta,mems:[n],ph:'id'+n,image:meta.image||'preview'}));
+      setProg(`Adding ${news.length} previews…`);
+      await commit(`Add ${news.length} previews`,{mutate:a=>chk([...a,...news])});
+    }
     else{
       const files=[...$('file').files];
       if(!files.length){alert('Choose at least one image');return}
@@ -796,7 +826,7 @@ $('bkapply').onclick=async()=>{
 $('bkdel').onclick=async()=>{
   if(!admin||!picked.size)return;
   if(!confirm(`Delete ${picked.size} selected pola permanently? This cannot be undone.`))return;
-  const ids=new Set(picked),del=[...ids].flatMap(id=>[`img/${id}.jpg`,`th/${id}.jpg`]);
+  const ids=new Set(picked),del=delPaths([...ids]);
   $('bkdel').disabled=true;
   try{await commit(`Delete ${ids.size} pola`,{del,mutate:a=>a.filter(i=>!ids.has(i.id))});picked.clear();render();alert(DONE)}
   catch(e){alert('Failed: '+e.message)}
@@ -816,7 +846,7 @@ async function doImgUpdate(pairs){
   /* only the picture (and for 2+ images the member) changes; a preview becomes a real image */
   await commit(pairs.length>1?`Update ${pairs.length} images`:'Update image',{add,mutate:a=>chk(a.map(i=>{
     const u=upd[i.id];if(!u)return i;
-    return {...i,...(u.mems?{mems:u.mems}:{}),v:u.v,image:i.image==='preview'?'real image':i.image};
+    return {...i,...(u.mems?{mems:u.mems}:{}),v:u.v,image:i.image==='preview'?'real image':i.image,ph:undefined};   /* the new picture replaces a colour preview */
   }))});
 }
 let uiState=null;
@@ -834,13 +864,13 @@ function startImgUpdate(files){
   uiState={sel,files,urls:files.map(f=>URL.createObjectURL(f))};
   const opts=sel.map(i=>`<option value="${i.id}">${esc(titleOf(i))||'—'} · ${esc(memTxt(i)||'no member')} · ${fmt(i.date)}</option>`).join('');
   const ib=admin?RAW:'';
-  $('uirows').innerHTML=files.map((f,k)=>`<div class="uirow"><div class="uiimgs"><img src="${uiState.urls[k]}" alt="new"><img class="uiold" src="${ib}th/${sel[k].id}.jpg${vq(sel[k])}" alt="old"></div><div class="uimid"><label>new image ${k+1}: replaces</label><select class="uisel">${opts.replace(`value="${sel[k].id}"`,`value="${sel[k].id}" selected`)}</select><label>member(s) of the new image</label>${memGrid([])}</div></div>`).join('');
+  $('uirows').innerHTML=files.map((f,k)=>`<div class="uirow"><div class="uiimgs"><img src="${uiState.urls[k]}" alt="new"><img class="uiold" src="${thumbOf(sel[k])}" data-ph="${sel[k].ph||''}" onerror="phErr(this)" alt="old"></div><div class="uimid"><label>new image ${k+1}: replaces</label><select class="uisel">${opts.replace(`value="${sel[k].id}"`,`value="${sel[k].id}" selected`)}</select><label>member(s) of the new image</label>${memGrid([])}</div></div>`).join('');
   $('uiprog').textContent='';$('uidlg').showModal();
 }
 $('uirows').onchange=e=>{
   const sl=e.target.closest('.uisel');if(!sl)return;
   const old=sl.closest('.uirow').querySelector('.uiold');
-  old.src=(admin?RAW:'')+'th/'+sl.value+'.jpg'+vq(items.find(i=>i.id===sl.value));
+  const it2=items.find(i=>i.id===sl.value);old.dataset.ph=it2.ph||'';old.dataset.k=0;old.src=thumbOf(it2);
 };
 $('uicancel').onclick=()=>$('uidlg').close();
 $('uiapply').onclick=async()=>{
@@ -862,7 +892,7 @@ $('bkimgf').onchange=e=>startImgUpdate([...e.target.files]);
 
 /* detail view */
 function openView(it){
-  $('vimg').src=(admin?RAW:'')+'img/'+it.id+'.jpg'+vq(it);$('vmem').textContent=memTxt(it)||'—';
+  $('vimg').dataset.ph=it.ph||'';$('vimg').dataset.k=0;$('vimg').src=fullOf(it);$('vmem').textContent=memTxt(it)||'—';
   $('vshop').textContent=it.shop||'—';$('vera').textContent=it.era||'—';$('vround').textContent=it.round||'—';$('vtype').textContent=(it.types||[]).join(' + ')||'—';$('vdate').textContent=fmt(it.date);
   $('view').scrollTop=0;$('view').showModal();
 }
@@ -875,7 +905,7 @@ document.addEventListener('click',async e=>{
   else if(admin&&t.dataset.e)openDlg(items.find(x=>x.id===t.dataset.e));
   else if(admin&&t.dataset.x&&confirm('Delete this image?')){
     const id=t.dataset.x;
-    try{await commit('Delete pola',{del:[`img/${id}.jpg`,`th/${id}.jpg`],mutate:a=>a.filter(i=>i.id!==id)});render();alert(DONE)}
+    try{await commit('Delete pola',{del:delPaths([id]),mutate:a=>a.filter(i=>i.id!==id)});render();alert(DONE)}
     catch(err){alert('Failed: '+err.message)}
   }
 });
@@ -1040,7 +1070,7 @@ function tileHtml(l,fns){
   const have=new Set(items.map(i=>i.id));
   const ids=[...(listSets[l.id]||[])].filter(id=>have.has(id));
   const pick=ids.length?ids[Math.floor(Math.random()*ids.length)]:null;
-  const tile=`<button class="qt" ${fns?'data-lv':'data-ql'}="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${admin?RAW:''}th/${pick}.jpg${vq(items.find(x=>x.id===pick))}" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}${fns?` <span class="qc">(${ids.length})</span>`:''}</div></button>`;
+  const tile=`<button class="qt" ${fns?'data-lv':'data-ql'}="${l.id}" title="${esc(l.name)} (${ids.length} pola)"><div class="qimg">${pick?`<img src="${thumbOf(items.find(x=>x.id===pick))}" data-ph="${(items.find(x=>x.id===pick)||{}).ph||''}" onerror="phErr(this)" alt="">`:'empty list'}</div><div class="qname">${esc(l.name)}${fns?` <span class="qc">(${ids.length})</span>`:''}</div></button>`;
   if(!fns)return tile;
   const pub=l.is_public!==false;
   return `<div class="qcol">${tile}<div class="qfns"><button class="qfn" data-lp="${l.id}" title="${pub?'public: anyone with the link can view it. click to make it private':'private: only you can open it. click to make it public'}">${pub?'🌐':'🔒'}</button><button class="qfn" data-lc="${l.id}" title="copy the link of this list">🔗</button><button class="qfn" data-lr="${l.id}" title="rename">✎</button><button class="qfn" data-ld="${l.id}" title="delete" style="color:var(--danger)">🗑</button></div></div>`;
